@@ -1,0 +1,7 @@
+# Vite dev-server cache (auto-generated)
+.vite/
+
+# OS / editor
+Thumbs.db
+.DS_Store
+.vscode/

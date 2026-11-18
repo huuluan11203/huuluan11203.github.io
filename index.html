@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bùi Hữu Luân — Software Engineer | Portfolio</title>
+    <meta
+      name="description"
+      content="Portfolio của Bùi Hữu Luân — Software Engineer định hướng Backend (Java / Spring Boot), sinh viên Công nghệ Thông tin, Đại học Sài Gòn."
+    />
+
+    <!-- Google Fonts: Be Vietnam Pro (Vietnamese + Latin) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome 6.5.2 -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- Aurora ribbon (WebGL, aurora.js) — under the dot grid -->
+    <canvas id="auroraBg" class="aurora-bg" aria-hidden="true"></canvas>
+
+    <!-- Animated dot-grid background (dots.js) -->
+    <canvas id="dotBg" class="dot-bg" aria-hidden="true"></canvas>
+
+    <!-- Scroll progress bar -->
+    <div class="scroll-progress" aria-hidden="true"><span id="scrollProgress"></span></div>
+
+    <!-- Fixed Top Navigation -->
+    <header class="site-header">
+      <div class="header-inner">
+        <nav class="nav-pill" aria-label="Primary Navigation">
+          <a href="#home" class="nav-link active" data-section="home" data-i18n="nav.home">Trang chủ</a>
+          <a href="#about" class="nav-link" data-section="about" data-i18n="nav.about">Giới thiệu</a>
+          <a href="#skills" class="nav-link" data-section="skills" data-i18n="nav.skills">Công nghệ</a>
+          <a href="#expertise" class="nav-link" data-section="expertise" data-i18n="nav.expertise">Năng lực</a>
+          <a href="#contact" class="nav-link" data-section="contact" data-i18n="nav.contact">Liên hệ</a>
+        </nav>
+
+        <div class="header-actions">
+          <button
+            type="button"
+            class="lang-pill"
+            id="langToggleDesktop"
+            aria-label="Switch language between Vietnamese and English"
+          >
+            <span class="lang-opt active" data-lang-ind="vi">VI</span>
+            <span class="lang-sep" aria-hidden="true">/</span>
+            <span class="lang-opt" data-lang-ind="en">EN</span>
+          </button>
+        </div>
+
+        <button
+          type="button"
+          class="burger-btn"
+          id="burgerBtn"
+          aria-label="Menu"
+          aria-expanded="false"
+          aria-controls="mobileMenu"
+        >
+          <span class="burger-bar"></span>
+          <span class="burger-bar"></span>
+          <span class="burger-bar"></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Mobile Overlay & Sheet Menu -->
+    <div class="mobile-overlay" id="mobileOverlay" hidden></div>
+    <div class="mobile-sheet" id="mobileMenu" role="dialog" aria-modal="true" aria-label="Navigation Menu" hidden>
+      <nav class="mobile-nav" aria-label="Mobile Navigation">
+        <a href="#home" class="mobile-link active" style="--i: 0" data-section="home" data-i18n="nav.home">Trang chủ</a>
+        <a href="#about" class="mobile-link" style="--i: 1" data-section="about" data-i18n="nav.about">Giới thiệu</a>
+        <a href="#skills" class="mobile-link" style="--i: 2" data-section="skills" data-i18n="nav.skills">Công nghệ</a>
+        <a href="#expertise" class="mobile-link" style="--i: 3" data-section="expertise" data-i18n="nav.expertise">Năng lực</a>
+        <a href="#contact" class="mobile-link" style="--i: 4" data-section="contact" data-i18n="nav.contact">Liên hệ</a>
+      </nav>
+
+      <div class="mobile-sheet-actions">
+        <button
+          type="button"
+          class="mobile-lang-btn"
+          id="langToggleMobile"
+          aria-label="Switch language between Vietnamese and English"
+        >
+          <i class="fa-solid fa-globe" aria-hidden="true"></i>
+          <span data-i18n="nav.switchLabel">Ngôn ngữ: Tiếng Việt → EN</span>
+        </button>
+        <a href="#contact" class="mobile-signin-btn" data-i18n="nav.cta">Liên hệ với tôi</a>
+      </div>
+    </div>
+
+    <main>
+      <!-- =========================================================
+           HERO
+           ========================================================= -->
+      <section class="page" id="home" aria-label="Hero">
+        <div class="header-spacer" aria-hidden="true"></div>
+
+        <div class="hero" id="heroContent">
+          <h1 class="headline anim">
+            <span class="headline-line line-1">Bùi Hữu Luân</span>
+          </h1>
+
+          <p class="hero-role anim" style="--d: 0.22s">Software Engineer</p>
+
+
+          <p class="subhead anim" style="--d: 0.48s" data-i18n="hero.subhead">
+            Tận dụng AI để làm nhanh hơn, nhưng mọi dòng code đều được tôi hiểu, kiểm chứng và chịu trách nhiệm.
+          </p>
+
+          <div class="hero-actions anim" style="--d: 0.6s">
+            <a href="#expertise" class="cta-btn" style="--d: 0.6s" data-i18n="hero.cta">Xem năng lực</a>
+            <a href="#contact" class="dark-action-pill hero-secondary">
+              <span data-i18n="hero.cta2">Liên hệ</span>
+              <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Honest highlights (no invented numbers) -->
+        <div class="stats-footer hero-facts" id="heroFacts">
+          <div class="stat-item anim" style="--d: 0.72s">
+            <span class="hero-fact-title">Java · Spring Boot</span>
+            <span class="stat-label" data-i18n="facts.f1">Backend chủ lực</span>
+          </div>
+          <div class="stat-item anim" style="--d: 0.8s">
+            <span class="hero-fact-title">PostgreSQL · MySQL</span>
+            <span class="stat-label" data-i18n="facts.f2">Cơ sở dữ liệu quan hệ</span>
+          </div>
+          <div class="stat-item anim" style="--d: 0.88s">
+            <span class="hero-fact-title" data-i18n="facts.f3Title">Thiết kế hệ thống</span>
+            <span class="stat-label" data-i18n="facts.f3">API phân tầng · đồng thời</span>
+          </div>
+          <div class="stat-item anim" style="--d: 0.96s">
+            <span class="hero-fact-title" data-i18n="facts.f4Title">Đại học Sài Gòn</span>
+            <span class="stat-label" data-i18n="facts.f4">CNTT · 2022 –   </span>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           01 — ABOUT
+           ========================================================= -->
+      <section class="content-section" id="about">
+        <div class="container">
+          <div class="section-header reveal-on-scroll">
+            <span class="section-kicker">01 — <span data-i18n="nav.about">Giới thiệu</span></span>
+            <h2 class="section-title" data-i18n="about.title">Xây backend chắc chắn, hiểu rõ từng quyết định.</h2>
+          </div>
+
+          <div class="about-grid">
+            <figure class="about-photo-wrap reveal-on-scroll">
+              <img
+                src="assets/bui-huu-luan.jpg"
+                alt="Bùi Hữu Luân"
+                class="about-photo"
+                loading="lazy"
+                width="640"
+                height="800"
+              />
+            </figure>
+
+            <div class="about-body reveal-on-scroll">
+              <h3 class="about-lead" data-i18n="about.lead">
+                Sinh viên năm cuối ngành Công nghệ Thông tin tại Đại học Sài Gòn, định hướng Backend / Software Engineer.
+              </h3>
+
+              <p class="about-text" data-i18n="about.p1">
+                Thế mạnh của tôi là Java và Spring Boot: thiết kế RESTful API theo kiến trúc phân tầng, mô hình hoá dữ liệu trên PostgreSQL / MySQL và đảm bảo hệ thống vẫn chạy đúng khi nhiều người dùng thao tác cùng lúc.
+              </p>
+
+              <p class="about-text" data-i18n="about.p2">
+                Bên cạnh Java, tôi làm việc với JavaScript, C# (ASP.NET Core) và Python. Tôi đang tìm vị trí Fresher Software Developer để đóng góp vào sản phẩm thực tế, làm việc trong môi trường Agile/Scrum và phát triển lên Software Engineer.
+              </p>
+
+              <dl class="about-facts">
+                <div class="fact-row">
+                  <dt data-i18n="about.f1Label">Học vấn</dt>
+                  <dd data-i18n="about.f1Val">Đại học Sài Gòn — CNTT (2022 – nay)</dd>
+                </div>
+                <div class="fact-row">
+                  <dt data-i18n="about.f2Label">Định hướng</dt>
+                  <dd data-i18n="about.f2Val">Backend · Software Engineer</dd>
+                </div>
+                <div class="fact-row">
+                  <dt data-i18n="about.f3Label">Công nghệ chính</dt>
+                  <dd>Java · Spring Boot · SQL</dd>
+                </div>
+                <div class="fact-row">
+                  <dt data-i18n="about.f4Label">Khu vực</dt>
+                  <dd data-i18n="about.f4Val">TP. Hồ Chí Minh</dd>
+                </div>
+              </dl>
+
+              <div class="about-links">
+                <a href="https://github.com/huuluan11203" target="_blank" rel="noopener noreferrer" class="dark-action-pill">
+                  <i class="fa-brands fa-github" aria-hidden="true"></i>
+                  <span>GitHub</span>
+                </a>
+                <a href="https://www.linkedin.com/in/huulu" target="_blank" rel="noopener noreferrer" class="dark-action-pill">
+                  <i class="fa-brands fa-linkedin-in" aria-hidden="true"></i>
+                  <span>LinkedIn</span>
+                </a>
+                <a href="#contact" class="light-action-pill" data-i18n="about.contactBtn">Liên hệ trực tiếp</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           02 — TECH STACK
+           ========================================================= -->
+      <section class="content-section" id="skills">
+        <div class="container">
+          <div class="section-header reveal-on-scroll">
+            <span class="section-kicker">02 — <span data-i18n="nav.skills">Công nghệ</span></span>
+            <h2 class="section-title" data-i18n="skills.title">Công cụ tôi dùng mỗi ngày.</h2>
+            <p class="section-subtitle" data-i18n="skills.subtitle">
+              Java là ngôn ngữ chính; các công nghệ còn lại giúp tôi đi trọn vòng đời một tính năng — từ thiết kế dữ liệu đến kiểm thử và đóng gói.
+            </p>
+          </div>
+
+          <div class="stack-grid reveal-group" data-stagger>
+            <div class="skill-block stack-card reveal-item">
+              <div class="skill-block-head">
+                <span class="stack-icon" aria-hidden="true"><i class="fa-solid fa-code"></i></span>
+                <h3 data-i18n="skills.g1">Ngôn ngữ</h3>
+              </div>
+              <ul class="skill-pills">
+                <li class="is-primary">Java</li>
+                <li>JavaScript</li>
+                <li>C#</li>
+                <li>Python</li>
+                <li>SQL</li>
+              </ul>
+            </div>
+
+            <div class="skill-block stack-card reveal-item">
+              <div class="skill-block-head">
+                <span class="stack-icon" aria-hidden="true"><i class="fa-solid fa-layer-group"></i></span>
+                <h3 data-i18n="skills.g2">Backend &amp; Framework</h3>
+              </div>
+              <ul class="skill-pills">
+                <li class="is-primary">Spring Boot</li>
+                <li>Spring Security</li>
+                <li>Hibernate / JPA</li>
+                <li>ASP.NET Core</li>
+                <li>Django</li>
+                <li>React</li>
+              </ul>
+            </div>
+
+            <div class="skill-block stack-card reveal-item">
+              <div class="skill-block-head">
+                <span class="stack-icon" aria-hidden="true"><i class="fa-solid fa-database"></i></span>
+                <h3 data-i18n="skills.g3">Cơ sở dữ liệu</h3>
+              </div>
+              <ul class="skill-pills">
+                <li class="is-primary">PostgreSQL</li>
+                <li>MySQL</li>
+                <li data-i18n="skills.dbModel">Mô hình hoá dữ liệu</li>
+                <li data-i18n="skills.dbTune">Tối ưu truy vấn</li>
+                <li>Transaction</li>
+              </ul>
+            </div>
+
+            <div class="skill-block stack-card reveal-item">
+              <div class="skill-block-head">
+                <span class="stack-icon" aria-hidden="true"><i class="fa-solid fa-screwdriver-wrench"></i></span>
+                <h3 data-i18n="skills.g4">Kiểm thử &amp; Công cụ</h3>
+              </div>
+              <ul class="skill-pills">
+                <li>JUnit</li>
+                <li>Mockito</li>
+                <li>AssertJ</li>
+                <li>Git</li>
+                <li>Docker</li>
+                <li>Postman</li>
+                <li>Swagger / OpenAPI</li>
+              </ul>
+            </div>
+
+            <div class="skill-block stack-card stack-card-wide reveal-item">
+              <div class="skill-block-head">
+                <span class="stack-icon" aria-hidden="true"><i class="fa-solid fa-seedling"></i></span>
+                <h3 data-i18n="skills.g5">Đang tìm hiểu &amp; đã làm quen</h3>
+              </div>
+              <ul class="skill-pills is-muted">
+                <li>NestJS</li>
+                <li>Microservices</li>
+                <li>Kafka / RabbitMQ</li>
+                <li>Redis</li>
+                <li>Kubernetes</li>
+                <li>CI/CD</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           03 — PROBLEM-SOLVING EXPERTISE
+           ========================================================= -->
+      <section class="content-section" id="expertise">
+        <div class="container">
+          <div class="section-header reveal-on-scroll">
+            <span class="section-kicker">03 — <span data-i18n="nav.expertise">Năng lực</span></span>
+            <h2 class="section-title" data-i18n="exp.title">Những bài toán tôi xử lý được.</h2>
+            <p class="section-subtitle" data-i18n="exp.subtitle">
+              Không chỉ viết cho chạy — tôi quan tâm hệ thống chạy đúng, nhanh và an toàn khi lượng dữ liệu và người dùng tăng lên.
+            </p>
+          </div>
+
+          <div class="expertise-grid reveal-group" data-stagger>
+            <article class="skill-block exp-card reveal-item">
+              <div class="exp-top">
+                <span class="exp-index">01</span>
+                <span class="stack-icon" aria-hidden="true"><i class="fa-solid fa-sitemap"></i></span>
+              </div>
+              <h3 data-i18n="exp.c1Title">Thiết kế hệ thống &amp; API</h3>
+              <p data-i18n="exp.c1Desc">
+                RESTful API theo kiến trúc phân tầng Controller – Service – Repository, tách bạch nghiệp vụ để dễ mở rộng và bảo trì; tài liệu hoá bằng Swagger / OpenAPI.
+              </p>
+            </article>
+
+            <article class="skill-block exp-card reveal-item">
+              <div class="exp-top">
+                <span class="exp-index">02</span>
+                <span class="stack-icon" aria-hidden="true"><i class="fa-solid fa-lock"></i></span>
+              </div>
+              <h3 data-i18n="exp.c2Title">Xử lý truy cập đồng thời</h3>
+              <p data-i18n="exp.c2Desc">
+                Ngăn race condition khi nhiều người dùng cùng thao tác trên một tài nguyên bằng Pessimistic Locking và quản lý transaction, giữ dữ liệu luôn chính xác.
+              </p>
+            </article>
+
+            <article class="skill-block exp-card reveal-item">
+              <div class="exp-top">
+                <span class="exp-index">03</span>
+                <span class="stack-icon" aria-hidden="true"><i class="fa-solid fa-gauge-high"></i></span>
+              </div>
+              <h3 data-i18n="exp.c3Title">Tối ưu truy vấn</h3>
+              <p data-i18n="exp.c3Desc">
+                Phát hiện và xử lý N+1 query bằng JOIN FETCH / EntityGraph, giảm số lần truy cập database không cần thiết và tăng tốc độ tải dữ liệu.
+              </p>
+            </article>
+
+            <article class="skill-block exp-card reveal-item">
+              <div class="exp-top">
+                <span class="exp-index">04</span>
+                <span class="stack-icon" aria-hidden="true"><i class="fa-solid fa-shield-halved"></i></span>
+              </div>
+              <h3 data-i18n="exp.c4Title">Xác thực &amp; phân quyền</h3>
+              <p data-i18n="exp.c4Desc">
+                Xác thực stateless với JWT và phân quyền theo vai trò bằng Spring Security.
+              </p>
+            </article>
+
+            <article class="skill-block exp-card reveal-item">
+              <div class="exp-top">
+                <span class="exp-index">05</span>
+                <span class="stack-icon" aria-hidden="true"><i class="fa-solid fa-vial-circle-check"></i></span>
+              </div>
+              <h3 data-i18n="exp.c5Title">Kiểm thử tự động</h3>
+              <p data-i18n="exp.c5Desc">
+                Viết unit test cho tầng controller và service với JUnit, Mockito, AssertJ để thay đổi và refactor code một cách an toàn.
+              </p>
+            </article>
+
+            <article class="skill-block exp-card reveal-item">
+              <div class="exp-top">
+                <span class="exp-index">06</span>
+                <span class="stack-icon" aria-hidden="true"><i class="fa-solid fa-diagram-project"></i></span>
+              </div>
+              <h3 data-i18n="exp.c6Title">Thuật toán &amp; tối ưu hoá</h3>
+              <p data-i18n="exp.c6Desc">
+                Giải thuật metaheuristic (Genetic Algorithm, ALNS), các toán tử local search và xử lý dữ liệu không gian cho bài toán tối ưu.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           04 — AI APPROACH
+           ========================================================= -->
+      <section class="content-section ai-section" id="ai">
+        <div class="container">
+
+          <div class="ai-grid reveal-group" data-stagger>
+            <div class="skill-block ai-card reveal-item">
+              <span class="ai-step">1</span>
+              <h3 data-i18n="ai.p1Title">Hiểu trước, sinh code sau</h3>
+              <p data-i18n="ai.p1Desc">Tôi tự phân tích bài toán và thiết kế giải pháp; AI chỉ giúp đẩy nhanh phần triển khai.</p>
+            </div>
+            <div class="skill-block ai-card reveal-item">
+              <span class="ai-step">2</span>
+              <h3 data-i18n="ai.p2Title">Kiểm chứng mọi đầu ra</h3>
+              <p data-i18n="ai.p2Desc">Code do AI gợi ý luôn được đọc hiểu, viết test và review như code của bất kỳ ai khác.</p>
+            </div>
+            <div class="skill-block ai-card reveal-item">
+              <span class="ai-step">3</span>
+              <h3 data-i18n="ai.p3Title">Làm chủ quyết định</h3>
+              <p data-i18n="ai.p3Desc">Kiến trúc, đánh đổi kỹ thuật và chất lượng sản phẩm là trách nhiệm của tôi — không phải của công cụ.</p>
+            </div>
+          </div>
+
+          <div class="research-note reveal-on-scroll">
+            <span class="research-label" data-i18n="ai.researchLabel">Nghiên cứu</span>
+            <p data-i18n="ai.research">
+              Bài báo “Đề xuất khung điều phối prompt động để giải đề thi Toán tốt nghiệp THPT Việt Nam bằng mô hình ngôn ngữ lớn” — đã nộp tới hội nghị AIIA 2026 (The second AI Bridge Conference).
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           05 — CONTACT
+           ========================================================= -->
+      <section class="content-section contact-section" id="contact">
+        <div class="container">
+          <div class="contact-grid">
+            <div class="contact-info reveal-on-scroll">
+              <span class="section-kicker">04 — <span data-i18n="nav.contact">Liên hệ</span></span>
+              <h2 class="section-title" data-i18n="contact.title">Cùng trao đổi nhé.</h2>
+              <p class="section-subtitle" data-i18n="contact.subtitle">
+                Tôi đang tìm vị trí Fresher Software Developer. Nếu bạn có cơ hội phù hợp hoặc muốn trao đổi, hãy để lại lời nhắn.
+              </p>
+
+              <div class="contact-channels">
+                <div class="channel-item">
+                  <span class="channel-label">EMAIL</span>
+                  <div class="channel-row">
+                    <a href="mailto:huuluan11203@gmail.com" class="channel-link" id="emailText">huuluan11203@gmail.com</a>
+                    <button type="button" class="copy-btn" id="copyEmailBtn" data-i18n="contact.copy">Sao chép</button>
+                  </div>
+                </div>
+
+                <div class="channel-item">
+                  <span class="channel-label" data-i18n="contact.phoneLabel">ĐIỆN THOẠI</span>
+                  <a href="tel:+84878678691" class="channel-link">(+84) 0878 678 691</a>
+                </div>
+
+                <div class="channel-item">
+                  <span class="channel-label" data-i18n="contact.socialLabel">MẠNG XÃ HỘI</span>
+                  <div class="channel-socials">
+                    <a href="https://github.com/huuluan11203" target="_blank" rel="noopener noreferrer" class="channel-link">
+                      <i class="fa-brands fa-github" aria-hidden="true"></i> GitHub
+                    </a>
+                    <a href="https://www.linkedin.com/in/huulu" target="_blank" rel="noopener noreferrer" class="channel-link">
+                      <i class="fa-brands fa-linkedin" aria-hidden="true"></i> LinkedIn
+                    </a>
+                  </div>
+                </div>
+
+                <div class="channel-item">
+                  <span class="channel-label" data-i18n="contact.locLabel">KHU VỰC</span>
+                  <span class="channel-static" data-i18n="contact.locVal">TP. Hồ Chí Minh, Việt Nam</span>
+                </div>
+              </div>
+            </div>
+
+            <form class="contact-form reveal-on-scroll" id="contactForm" novalidate>
+              <div class="form-field">
+                <label for="senderName" data-i18n="contact.nameLabel">Họ và tên của bạn</label>
+                <input type="text" id="senderName" name="name" required autocomplete="name"
+                  placeholder="Nguyễn Văn A" data-i18n-placeholder="contact.namePh" />
+              </div>
+
+              <div class="form-field">
+                <label for="senderEmail" data-i18n="contact.emailLabel">Địa chỉ Email</label>
+                <input type="email" id="senderEmail" name="email" required autocomplete="email"
+                  placeholder="ban@congty.com" data-i18n-placeholder="contact.emailPh" />
+              </div>
+
+              <div class="form-field">
+                <label for="senderMessage" data-i18n="contact.msgLabel">Nội dung</label>
+                <textarea id="senderMessage" name="message" rows="4" required
+                  placeholder="Vị trí, cơ hội hoặc điều bạn muốn trao đổi..." data-i18n-placeholder="contact.msgPh"></textarea>
+              </div>
+
+              <div class="form-footer">
+                <button type="submit" class="submit-pill" data-i18n="contact.sendBtn">Gửi lời nhắn</button>
+                <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <p class="footer-copy">
+          <span>© 2026 Bùi Hữu Luân.</span>
+          <span class="footer-muted" data-i18n="footer.note">Software Engineer · TP. Hồ Chí Minh</span>
+        </p>
+        <a href="#home" class="back-top-link" data-i18n="footer.top">Lên đầu trang ↑</a>
+      </div>
+    </footer>
+
+    <script src="main.js"></script>
+    <script src="dots.js"></script>
+    <script src="aurora.js"></script>
+  </body>
+</html>
