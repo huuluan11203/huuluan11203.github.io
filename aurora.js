@@ -23,14 +23,15 @@
     speed: 0.5, // tốc độ chung (2 = nhanh gấp đôi)
     intensity: 1, // độ sáng tổng
     scrollDim: 0.8, // giảm sáng khi cuộn khỏi hero (0 = không giảm)
-    resolution: 0.8, // tỉ lệ độ phân giải vẽ
+    resolution: 0.5, // tỉ lệ độ phân giải vẽ (cực quang mềm nên 0.5 giữ nguyên độ mượt hình mà giảm ~61% GPU)
     paletteInterval: 6, // mỗi bao nhiêu giây thì đổi sang bộ màu kế tiếp (0 = cố định bộ đầu)
     paletteFade: 4, // thời gian chuyển màu mượt giữa hai bộ (giây)
-    lightStrength: 0.46, // chế độ sáng: hệ số đậm mặc định nếu bộ màu không chỉ định inkK
+    lightStrength: 0.55, // chế độ sáng: độ đậm của cực quang trên nền trắng (0 → 1)
+    lightColor: 1, // chế độ sáng: 0 = mực đơn sắc, 1 = nhiều màu pastel, 0.5 = màu trầm pha mực
     themeEase: 0.08, // tốc độ chuyển sáng ↔ tối (lớn = nhanh)
     // --- hiệu năng ---
     adaptive: true, // máy yếu (rớt dưới ~50fps liên tục 2 giây) → tự giảm độ phân giải vẽ
-    minResolution: 0.5, // độ phân giải thấp nhất khi tự giảm
+    minResolution: 0.35, // độ phân giải thấp nhất khi tự giảm
   };
 
   // Các bộ màu dịu mắt (mỗi bộ kèm màu mực đơn sắc hợp tông cho chế độ sáng)
@@ -172,6 +173,7 @@
     uniform vec3 uPaper;     // màu nền chế độ sáng (= biến CSS --paper)
     uniform vec3 uInk;       // màu cực quang ở chế độ sáng
     uniform float uInkK;     // độ đậm cực quang ở chế độ sáng
+    uniform float uLightColor; // 0 = mực đơn sắc, 1 = nhiều màu pastel trên nền sáng
     uniform vec3 uPink;
     uniform vec3 uViolet;
     uniform vec3 uBlue;
@@ -207,30 +209,38 @@
     // One sheet of light. y: 0 = top, 1 = bottom.
     vec3 sheet(float x, float y, float aspect, float t, float s,
                float top, float depth, float dip, float tilt, float thick, float rimK) {
-      vec2 p = vec2(x * aspect, y);
-      float m = t * uMorph;
-      float det = uDetail;
-
-      // domain warp → organic folding / morphing
-      vec2 q = vec2(
-        fbm(p * 0.9 + vec2(-m * 0.16, m * 0.05) + s),
-        fbm(p * 0.9 + vec2(5.2 - m * 0.13, 1.3 + m * 0.07) + s)
-      );
-
       // big shape: a dip (V / U / flat) at x = dip, plus a tilt
       // straight arms + rounded bottom (hyperbola) → no kinks; uRound: V ↔ U
       float dx = x - dip;
       float valley = 1.0 - (sqrt(dx * dx + uRound * uRound) - uRound) / 0.55;
-      float edge = top + depth * valley + tilt * (x - 0.5)
+      float baseEdge = top + depth * valley + tilt * (x - 0.5);
+
+      // Loại sớm theo khung bao toán học TRƯỚC khi tính bất kỳ fbm() nào (giống hệt pixel đầu ra)
+      float edgeMargin = uRipple + 0.10;
+      if (y <= baseEdge - edgeMargin - 0.05 || y >= baseEdge + edgeMargin + thick * 2.38) {
+        return vec3(0.0);
+      }
+
+      vec2 p = vec2(x * aspect, y);
+      float m = t * uMorph;
+      float det = uDetail;
+
+      // domain warp X (dùng cho biên trên); chỉ tính q.y sau khi chắc chắn nằm trong dải
+      float qx = fbm(p * 0.9 + vec2(-m * 0.16, m * 0.05) + s);
+      float edge = baseEdge
         // small details travelling LEFT -> RIGHT
         + uRipple * (fbm(vec2(x * 1.1 - t * uFlow, s)) - 0.5) * 2.0
         + 0.025 * sin(x * 4.0 - t * 0.6 + s)
-        + 0.14 * (q.x - 0.5) * det;
+        + 0.14 * (qx - 0.5) * det;
 
       float d = y - edge;                                    // > 0 inside the sheet
+      if (d <= -0.05) return vec3(0.0);                      // ngoài mép trên → topEdge = 0
+
+      vec2 q = vec2(qx, fbm(p * 0.9 + vec2(5.2 - m * 0.13, 1.3 + m * 0.07) + s));
 
       // thickness swings between a thin ribbon and a wide sheet
       float th = thick * (0.35 + 1.4 * fbm(vec2(x * 1.1 - t * uFlow * 1.4, s + 3.0) + q * 0.6));
+      if (d >= th * 1.35) return vec3(0.0);                  // ngoài mép dưới → bottom = 0
 
       float topEdge = smoothstep(-0.05, 0.05, d);            // soft, smoky upper edge
       float bottom = 1.0 - smoothstep(th * 0.55, th * 1.35, d);
@@ -245,13 +255,17 @@
 
       // iridescent colour bands following the edge, drifting with the warp
       float h = clamp(d / max(th, 0.02), 0.0, 1.2) + (q.y - 0.5) * 0.3 * det;
-      // teal appears as broken streaks drifting along the band (front sheet only)
-      float streak = smoothstep(0.42, 0.68, fbm(vec2(x * 1.3 - t * uFlow * 2.5, d * 7.0) + q * 1.2 + s)) * rimK;
+      // teal appears as broken streaks drifting along the band (front sheet only; back sheet skips fbm)
+      float streak = rimK > 0.0
+        ? smoothstep(0.42, 0.68, fbm(vec2(x * 1.3 - t * uFlow * 2.5, d * 7.0) + q * 1.2 + s)) * rimK
+        : 0.0;
       vec3 col = palette(clamp(h, 0.0, 1.0), det, streak);
 
-      // thin bright pink-violet line right on the top edge
-      float rim = exp(-abs(d - 0.004) / 0.024);
-      col = mix(col, uPink * 1.15, rim * 0.45 * rimK * det);
+      // thin bright pink-violet line right on the top edge (front sheet only)
+      if (rimK > 0.0) {
+        float rim = exp(-abs(d - 0.004) / 0.024);
+        col = mix(col, uPink * 1.15, rim * 0.45 * rimK * det);
+      }
 
       return col * body;
     }
@@ -286,6 +300,11 @@
       vec3 front = sheet(xw, yw, aspect, t, uSeed,
                          uTop, uDepth, uDip, uTilt, uThick, 1.0);
       vec3 c = (back * 0.14 + front) * uIntensity;
+      // Vùng trời trống (không có cực quang): bỏ qua dens fbm2, exp() và pha màu nền sáng
+      if (max(c.r, max(c.g, c.b)) <= 0.0005) {
+        gl_FragColor = vec4(mix(vec3(0.0), uPaper, uLight), 1.0);
+        return;
+      }
 
       // uneven smoke density: thick clumps and thin gaps that drift and morph
       float dens = 0.3 + 1.1 * fbm2(sp * 1.4 + sr * 2.2 + vec2(-st * 0.1, st * 0.12));
@@ -296,9 +315,13 @@
       c *= (1.0 - exp(-mx * 2.4)) / max(mx, 0.0001);
       c *= 1.0 - smoothstep(0.9, 1.0, y);                    // fade at the very bottom
 
-      // chế độ sáng: nền xám trắng, chỗ cực quang càng sáng thì mực xám đen càng đậm
+      // chế độ sáng: nền --paper, chuyển mượt giữa mực đơn sắc (uLightColor = 0) ↔ nhiều màu pastel (uLightColor = 1)
       float lum = clamp(max(c.r, max(c.g, c.b)), 0.0, 1.0);
-      vec3 inked = mix(uPaper, uInk, lum * uInkK);
+      vec3 tint = c / max(lum, 0.001);
+      float tintLum = dot(tint, vec3(0.299, 0.587, 0.114));
+      vec3 pigment = clamp(mix(vec3(tintLum), tint, 1.35), 0.0, 1.0) * 0.76;
+      vec3 lightTone = mix(uInk, pigment, uLightColor);
+      vec3 inked = mix(uPaper, lightTone, lum * uInkK);
       gl_FragColor = vec4(mix(c, inked, uLight), 1.0);
     }
   `;
@@ -341,17 +364,24 @@
     "uRes", "uTime", "uTop", "uDepth", "uDip", "uTilt", "uRound", "uRipple", "uFlow",
     "uThick", "uMorph", "uDetail", "uSeed", "uIntensity",
     "uSmoke", "uSmokeDensity", "uSmokeSpeed",
-    "uLight", "uPaper", "uInk", "uInkK",
+    "uLight", "uPaper", "uInk", "uInkK", "uLightColor",
     "uPink", "uViolet", "uBlue", "uTeal", "uDeep",
   ].forEach((n) => (U[n] = gl.getUniformLocation(prog, n)));
 
   let resolution = CFG.resolution; // có thể tự giảm trên máy yếu (xem loop)
+  let winH = window.innerHeight || 1;
+  let scrollYCached = window.scrollY || 0;
   function resize() {
     const s = resolution;
+    winH = window.innerHeight || 1;
     canvas.width = Math.max(1, Math.round(window.innerWidth * s));
-    canvas.height = Math.max(1, Math.round(window.innerHeight * s));
+    canvas.height = Math.max(1, Math.round(winH * s));
     gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.uniform2f(U.uRes, canvas.width, canvas.height);
   }
+  window.addEventListener("scroll", () => {
+    scrollYCached = window.scrollY || 0;
+  }, { passive: true });
 
   /* ---------- smooth random signals that drive the big shape ---------- */
   const TAU = Math.PI * 2;
@@ -392,6 +422,17 @@
     return Number.isNaN(n) || full.length !== 6 ? [0.906, 0.906, 0.918] : [(n >> 16) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
   }
   const paper = readPaper();
+  // Gửi các uniform hằng số 1 lần duy nhất thay vì mỗi khung hình
+  gl.uniform1f(U.uRipple, CFG.ripple);
+  gl.uniform1f(U.uFlow, CFG.flow);
+  gl.uniform1f(U.uThick, CFG.thickness);
+  gl.uniform1f(U.uMorph, CFG.morph);
+  gl.uniform1f(U.uSmoke, CFG.smoke);
+  gl.uniform1f(U.uSmokeDensity, CFG.smokeDensity);
+  gl.uniform1f(U.uSmokeSpeed, CFG.smokeSpeed);
+  gl.uniform3f(U.uPaper, paper[0], paper[1], paper[2]);
+  gl.uniform1f(U.uInkK, CFG.lightStrength);
+  gl.uniform1f(U.uLightColor, CFG.lightColor);
   window.addEventListener("themechange", () => {
     lightTarget = isLight() ? 1 : 0;
     if (reduce) {
@@ -417,7 +458,7 @@
       const step = CFG.paletteInterval;
       const idx = Math.floor(elapsed / step) % PALETTES.length;
       const ph = elapsed % step;
-      const fade = Math.min(CFG.paletteFade, step * 0.5);
+      const fade = Math.min(CFG.paletteFade, step);
       pA = PALETTES[idx];
       pB = PALETTES[(idx + 1) % PALETTES.length];
       pK = fade > 0 ? smooth(step - fade, step, ph) : 0;
@@ -450,39 +491,27 @@
     const tilt = (sTilt(shapeT) - 0.5) * 2 * CFG.tiltMax;
     const round = 0.05 + 0.25 * sRound(shapeT);
 
-    // --- dim while scrolled past the hero
-    const scrolled = Math.min(1, window.scrollY / window.innerHeight);
+    // --- dim while scrolled past the hero (dùng scrollYCached tránh ép layout sync)
+    const scrolled = Math.min(1, scrollYCached / winH);
     scrollK += (1 - CFG.scrollDim * scrolled - scrollK) * 0.08;
     light += (lightTarget - light) * CFG.themeEase;
     if (Math.abs(lightTarget - light) < 0.001) light = lightTarget;
 
-    gl.uniform2f(U.uRes, canvas.width, canvas.height);
     gl.uniform1f(U.uTime, t);
     gl.uniform1f(U.uTop, top);
     gl.uniform1f(U.uDepth, depth);
     gl.uniform1f(U.uDip, dip);
     gl.uniform1f(U.uTilt, tilt);
     gl.uniform1f(U.uRound, round);
-    gl.uniform1f(U.uRipple, CFG.ripple);
-    gl.uniform1f(U.uFlow, CFG.flow);
-    gl.uniform1f(U.uThick, CFG.thickness);
-    gl.uniform1f(U.uMorph, CFG.morph);
-    gl.uniform1f(U.uSmoke, CFG.smoke);
-    gl.uniform1f(U.uSmokeDensity, CFG.smokeDensity);
-    gl.uniform1f(U.uSmokeSpeed, CFG.smokeSpeed);
     gl.uniform1f(U.uDetail, detail);
     gl.uniform1f(U.uSeed, seed);
     gl.uniform1f(U.uLight, light);
-    gl.uniform3f(U.uPaper, paper[0], paper[1], paper[2]);
     setMix3(U.uPink, pA.pink, pB.pink, pK);
     setMix3(U.uViolet, pA.violet, pB.violet, pK);
     setMix3(U.uBlue, pA.blue, pB.blue, pK);
     setMix3(U.uTeal, pA.teal, pB.teal, pK);
     setMix3(U.uDeep, pA.deep, pB.deep, pK);
     setMix3(U.uInk, pA.ink, pB.ink, pK);
-    const inkKA = pA.inkK ?? CFG.lightStrength;
-    const inkKB = pB.inkK ?? CFG.lightStrength;
-    gl.uniform1f(U.uInkK, inkKA + (inkKB - inkKA) * pK);
     gl.uniform1f(U.uIntensity, CFG.intensity * env * scrollK * (0.5 + 0.5 * detail));
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
@@ -496,8 +525,11 @@
   let minFrameMs = Infinity; // ≈ chu kỳ quét của màn hình
   let lastNow = 0;
   let slowSince = 0;
+  let rafId = 0;
 
   function loop(now) {
+    rafId = 0;
+    if (document.visibilityState === "hidden") return;
     const dt = now - lastNow;
     lastNow = now;
     if (dt > 3 && dt < 100) {
@@ -507,7 +539,7 @@
 
     render(now);
 
-    if (CFG.adaptive && resolution > CFG.minResolution && document.visibilityState === "visible") {
+    if (CFG.adaptive && resolution > CFG.minResolution) {
       const slow = frameMs > Math.max(minFrameMs * 1.6, 20);
       if (!slow) slowSince = 0;
       else if (!slowSince) slowSince = now;
@@ -518,8 +550,15 @@
       }
     }
 
-    requestAnimationFrame(loop);
+    rafId = requestAnimationFrame(loop);
   }
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && !reduce && !rafId) {
+      lastNow = performance.now();
+      rafId = requestAnimationFrame(loop);
+    }
+  });
 
   window.addEventListener("resize", () => {
     resize();
@@ -527,5 +566,5 @@
   });
   resize();
   if (reduce) render(start + 5000);
-  else requestAnimationFrame(loop);
+  else rafId = requestAnimationFrame(loop);
 })();

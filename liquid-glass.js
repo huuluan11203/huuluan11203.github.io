@@ -25,8 +25,13 @@
     ".burger-btn",
     ".cta-btn",
     ".mobile-sheet",
+    ".mobile-lang-btn",
+    ".mobile-signin-btn",
     ".skill-block",
+    ".bento-card",
     ".contact-form",
+    ".submit-pill",
+    ".copy-btn",
     ".dark-action-pill",
     // .about-photo-wrap cố ý bỏ qua: ảnh che kín, chỉ lộ viền 3px → khúc xạ chỉ tốn GPU
   ].join(",");
@@ -36,16 +41,15 @@
     ior: 1.87, // chiết suất kính n₂ (1.0 = không bẻ cong)
     bezel: 35, // độ rộng viền cong (px)
     thickness: 50, // độ dày kính (px)
-    dispersion: 0.35, // tán sắc 0 → 1 (0 = 1 lần displacement, nhẹ GPU nhất)
+    dispersion: 0.35, // tán sắc 0 → 1: nút nhỏ tách 3 kênh RGB thật; tấm lớn nướng tán sắc vào --lg-spec
     blur: 1.5, // blur nền trước khi khúc xạ (px)
     saturate: 1.9,
     specAngle: 135, // góc nguồn sáng (độ), cố định
     specOpacity: 0.35,
   };
   const RESIZE_DEBOUNCE_MS = 150;
-  // Tấm kính lớn (form liên hệ, menu điện thoại) bỏ tán sắc: 3 lượt displacement trên
-  // ~200k px làm tụt còn ~45fps khi cuộn; viền màu ở mép tấm lớn gần như không thấy.
-  // Nút nhỏ vẫn giữ tán sắc (rẻ). Đặt Infinity để tán sắc mọi nơi.
+  // Tấm kính lớn (> 60k px², vd. hồ sơ, form liên hệ): giữ khúc xạ SVG 1 lượt (feDisplacementMap)
+  // + nướng tán sắc lăng kính vào lớp --lg-spec tĩnh (0 chi phí GPU thêm) thay vì 3 lượt tách kênh.
   const DISPERSION_MAX_AREA = 60000; // px² (vd. 245×245)
   // -----------------------------------------------------------------
 
@@ -125,22 +129,35 @@
       return { d: -sd, nx, ny };
     }
 
-    return function buildMaps(w, h, radius, params) {
+    return function buildMaps(w, h, radius, params, prism, needDisp) {
+      const minDim = Math.min(w, h);
       const r = Math.min(radius, w / 2, h / 2);
-      const p = Object.assign({}, params, { bezel: Math.min(params.bezel, Math.min(w, h) / 2) });
+      // Giữ tỉ lệ thickness/bezel ổn định cho nút nhỏ (< 48px như nút Sao chép 30px)
+      // để tia khúc xạ (kể cả kênh B) không vọt ra ngoài vùng filter gây sọc đỏ/vàng
+      const p = Object.assign({}, params, {
+        bezel: Math.min(params.bezel, minDim / 2),
+        thickness: params.thickness * Math.min(1, minDim / 48),
+      });
       const t = buildDisplacementTable(p, 128);
       const maxDisp = t.max || 1;
-      const disp = new Uint8ClampedArray(w * h * 4);
       const spec = new Uint8ClampedArray(w * h * 4);
       const la = (p.specAngle * Math.PI) / 180;
       const lx = Math.cos(la);
       const ly = Math.sin(la);
+      const bakePrism = !!(prism && p.dispersion > 0);
+      const halfDisp = needDisp && w * h > 60000;
+      const dw = needDisp ? (halfDisp ? Math.max(4, Math.round(w * 0.5)) : w) : 0;
+      const dh = needDisp ? (halfDisp ? Math.max(4, Math.round(h * 0.5)) : h) : 0;
+      const disp = needDisp ? new Uint8ClampedArray(dw * dh * 4) : null;
 
       for (let py = 0; py < h; py++) {
         for (let px = 0; px < w; px++) {
           const i = (py * w + px) * 4;
           let R = 128;
           let G = 128;
+          let sR = 255;
+          let sG = 255;
+          let sB = 255;
           let sA = 0;
           const field = roundedRectField(px + 0.5, py + 0.5, w, h, r);
           const d = field.d;
@@ -149,10 +166,12 @@
             const i0 = Math.floor(s);
             const fr = s - i0;
             const i1 = Math.min(i0 + 1, t.samples);
-            const mag = (t.table[i0] * (1 - fr) + t.table[i1] * fr) / maxDisp;
-            // lệch về phía trong = ngược pháp tuyến hướng ra; R = 128 + x·127, G = 128 + y·127
-            R = 128 - field.nx * mag * 127;
-            G = 128 - field.ny * mag * 127;
+            if (needDisp && !halfDisp) {
+              const mag = (t.table[i0] * (1 - fr) + t.table[i1] * fr) / maxDisp;
+              // lệch về phía trong = ngược pháp tuyến hướng ra; R = 128 + x·127, G = 128 + y·127
+              R = 128 - field.nx * mag * 127;
+              G = 128 - field.ny * mag * 127;
+            }
 
             // Specular: độ nghiêng mặt kính × mức hướng về nguồn sáng, góc đối diện yếu hơn
             const slope = t.slopes[i0] * (1 - fr) + t.slopes[i1] * fr;
@@ -161,19 +180,70 @@
             const lit = Math.pow(Math.max(facing, 0), 2) + 0.45 * Math.pow(Math.max(-facing, 0), 2);
             const rim = Math.max(0, 1 - d / 1.5) * 0.35; // đường viền mảnh ~1.5px
             sA = Math.min(1, lit * Math.pow(tilt, 1.5) + rim * (0.5 + 0.5 * Math.abs(facing))) * p.specOpacity;
+
+            // Tán sắc lăng kính nướng sẵn vào lớp specular cho tấm kính lớn (0 tốn GPU mỗi frame):
+            // mép ngoài sáng ngả ấm nhẹ (đỏ/vàng), mép trong & góc đối diện ngả lam/lục lam
+            if (bakePrism) {
+              const u = d / p.bezel;
+              const band = Math.pow(tilt, 1.2) * (1 - u) * p.dispersion;
+              if (facing >= 0) {
+                const warm = Math.max(0, 1 - u * 4.2) * facing;
+                const cool = Math.max(0, 1 - Math.abs(u - 0.34) * 3.4) * facing;
+                sR = Math.min(255, 255 - cool * 60);
+                sG = Math.min(255, 255 - warm * 24 - cool * 18);
+                sB = Math.min(255, 255 - warm * 54);
+              } else {
+                const opp = -facing;
+                sR = Math.min(255, 255 - opp * 65 * (1 - u));
+                sG = Math.min(255, 255 - opp * 38 * (1 - u));
+                sB = 255;
+              }
+              sA = Math.min(1, sA + band * 0.14 * (0.35 + 0.65 * Math.abs(facing)));
+            }
           }
-          disp[i] = R;
-          disp[i + 1] = G;
-          disp[i + 2] = 128; // kênh B bỏ qua
-          disp[i + 3] = 255;
-          spec[i] = 255;
-          spec[i + 1] = 255;
-          spec[i + 2] = 255;
+          if (needDisp && !halfDisp) {
+            disp[i] = R;
+            disp[i + 1] = G;
+            disp[i + 2] = 128; // kênh B bỏ qua
+            disp[i + 3] = 255;
+          }
+          spec[i] = sR;
+          spec[i + 1] = sG;
+          spec[i + 2] = sB;
           spec[i + 3] = sA * 255;
         }
       }
+
+      // Tấm kính lớn: dựng texture displacement ở 0.5× (viền cong 35px mượt nên GPU lọc song tuyến y hệt,
+      // nhưng giảm 75% dung lượng & băng thông bộ nhớ texture mỗi khung hình cuộn)
+      if (halfDisp) {
+        for (let py = 0; py < dh; py++) {
+          const oy = ((py + 0.5) / dh) * h;
+          for (let px = 0; px < dw; px++) {
+            const ox = ((px + 0.5) / dw) * w;
+            const i = (py * dw + px) * 4;
+            let R = 128;
+            let G = 128;
+            const field = roundedRectField(ox, oy, w, h, r);
+            const d = field.d;
+            if (d >= 0 && d < p.bezel) {
+              const s = (d / p.bezel) * t.samples;
+              const i0 = Math.floor(s);
+              const fr = s - i0;
+              const i1 = Math.min(i0 + 1, t.samples);
+              const mag = (t.table[i0] * (1 - fr) + t.table[i1] * fr) / maxDisp;
+              R = 128 - field.nx * mag * 127;
+              G = 128 - field.ny * mag * 127;
+            }
+            disp[i] = R;
+            disp[i + 1] = G;
+            disp[i + 2] = 128;
+            disp[i + 3] = 255;
+          }
+        }
+      }
       // feDisplacementMap dịch = scale · (C/255 − 0.5) → tối đa ±scale/2, nên scale = 2·maxΔ
-      return { disp, spec, scale: 2 * maxDisp };
+      return { disp, dw, dh, spec, scale: 2 * maxDisp };
     };
   }
 
@@ -181,21 +251,22 @@
   const WORKER_SOURCE =
     "const buildMaps = (" + mapKernel.toString() + ")();\n" +
     "self.onmessage = async (e) => {\n" +
-    "  const { key, w, h, r, params } = e.data;\n" +
+    "  const { key, w, h, r, params, prism, needDisp } = e.data;\n" +
     "  try {\n" +
-    "    const m = buildMaps(w, h, r, params);\n" +
-    "    const encode = async (data) => {\n" +
-    "      const canvas = new OffscreenCanvas(w, h);\n" +
-    "      canvas.getContext('2d').putImageData(new ImageData(data, w, h), 0, 0);\n" +
+    "    const m = buildMaps(w, h, r, params, prism, needDisp);\n" +
+    "    const encode = async (data, cw, ch) => {\n" +
+    "      const canvas = new OffscreenCanvas(cw, ch);\n" +
+    "      canvas.getContext('2d').putImageData(new ImageData(data, cw, ch), 0, 0);\n" +
     "      return new FileReaderSync().readAsDataURL(await canvas.convertToBlob({ type: 'image/png' }));\n" +
     "    };\n" +
-    "    self.postMessage({ key, scale: m.scale, dispURL: await encode(m.disp), specURL: await encode(m.spec) });\n" +
+    "    const dispURL = m.disp ? await encode(m.disp, m.dw, m.dh) : null;\n" +
+    "    self.postMessage({ key, scale: m.scale, dispURL, specURL: await encode(m.spec, w, h) });\n" +
     "  } catch (error) {\n" +
     "    self.postMessage({ key, error: String(error) });\n" +
     "  }\n" +
     "};";
 
-  const jobs = new Map(); // key → { w, h, r, resolve }
+  const jobs = new Map(); // key → { w, h, r, prism, needDisp, resolve }
   let worker = null;
   let mainBuild = null;
 
@@ -205,16 +276,16 @@
     const run = () => {
       jobs.delete(key);
       mainBuild = mainBuild || mapKernel();
-      const m = mainBuild(job.w, job.h, job.r, PARAMS);
+      const m = mainBuild(job.w, job.h, job.r, PARAMS, job.prism, job.needDisp);
       const canvas = document.createElement("canvas");
-      canvas.width = job.w;
-      canvas.height = job.h;
-      const context = canvas.getContext("2d");
-      const encode = (data) => {
-        context.putImageData(new ImageData(data, job.w, job.h), 0, 0);
+      const encode = (data, cw, ch) => {
+        canvas.width = cw;
+        canvas.height = ch;
+        canvas.getContext("2d").putImageData(new ImageData(data, cw, ch), 0, 0);
         return canvas.toDataURL("image/png");
       };
-      job.resolve({ scale: m.scale, dispURL: encode(m.disp), specURL: encode(m.spec) });
+      const dispURL = m.disp ? encode(m.disp, m.dw, m.dh) : null;
+      job.resolve({ scale: m.scale, dispURL, specURL: encode(m.spec, job.w, job.h) });
     };
     if (window.requestIdleCallback) requestIdleCallback(run, { timeout: 500 });
     else setTimeout(run, 0);
@@ -254,15 +325,19 @@
 
   const mapCache = new Map(); // key → Promise<{ scale, dispURL, specURL }>
 
-  function requestMaps(w, h, r) {
-    const key = w + "x" + h + "r" + r;
+  function requestMaps(w, h, r, prism, needDisp) {
+    const key = w + "x" + h + "r" + r + (prism ? "p" : "") + (needDisp ? "d" : "");
     if (mapCache.has(key)) return mapCache.get(key);
     if (mapCache.size >= 24) mapCache.delete(mapCache.keys().next().value);
     const promise = new Promise((resolve) => {
-      jobs.set(key, { w, h, r, resolve });
-      if (worker) worker.postMessage({ key, w, h, r, params: PARAMS });
+      jobs.set(key, { w, h, r, prism: !!prism, needDisp: !!needDisp, resolve });
+      if (worker) worker.postMessage({ key, w, h, r, params: PARAMS, prism: !!prism, needDisp: !!needDisp });
       else buildOnMainThread(key);
-    }).then((maps) => Promise.all([decode(maps.dispURL), decode(maps.specURL)]).then(() => maps));
+    }).then((maps) => {
+      const decodes = [decode(maps.specURL)];
+      if (maps.dispURL) decodes.push(decode(maps.dispURL));
+      return Promise.all(decodes).then(() => maps);
+    });
     mapCache.set(key, promise);
     return promise;
   }
@@ -284,7 +359,7 @@
     return node;
   }
 
-  function buildFilter(id, w, h, maps) {
+  function buildFilter(id, w, h, maps, noDisperse) {
     // Vùng filter = đúng kích thước phần tử (px), map cũng đúng kích thước đó.
     // color-interpolation-filters="sRGB" là bắt buộc, nếu không map bị đọc theo linearRGB → lệch sai.
     const f = el("filter", {
@@ -296,11 +371,12 @@
       filterUnits: "userSpaceOnUse",
       "color-interpolation-filters": "sRGB",
     });
-    el("feGaussianBlur", { in: "SourceGraphic", stdDeviation: PARAMS.blur, result: "blurred" }, f);
+    el("feGaussianBlur", { in: "SourceGraphic", stdDeviation: PARAMS.blur, edgeMode: "duplicate", result: "blurred" }, f);
     el("feImage", { href: maps.dispURL, x: 0, y: 0, width: w, height: h, preserveAspectRatio: "none", result: "map" }, f);
 
     // Ánh sáng xanh có chiết suất cao hơn đỏ → bị bẻ mạnh hơn: R = scale×(1−d), B = scale×(1+d)
-    const d = w * h > DISPERSION_MAX_AREA ? 0 : PARAMS.dispersion * 0.12;
+    // Tấm lớn hoặc nút nằm lồng trong tấm kính khác dùng 1 lượt displacement (giảm 70% GPU, nhìn y hệt)
+    const d = noDisperse || w * h > DISPERSION_MAX_AREA ? 0 : PARAMS.dispersion * 0.12;
     if (d === 0) {
       el("feDisplacementMap", { in: "blurred", in2: "map", scale: maps.scale, xChannelSelector: "R", yChannelSelector: "G", result: "rgb" }, f);
     } else {
@@ -351,24 +427,48 @@
     const key = w + "x" + h + "r" + r;
     if (key === g.key) return;
     const token = ++g.token;
-    requestMaps(w, h, r).then((maps) => {
+    const nested = !!(g.node.parentElement && g.node.parentElement.closest(".contact-form, .mobile-sheet, .bento-card"));
+    const large = w * h > DISPERSION_MAX_AREA;
+    requestMaps(w, h, r, nested || large, !nested).then((maps) => {
       if (token !== g.token || reducedTransparency.matches) return;
-      const filter = buildFilter(g.id, w, h, maps);
+      g.key = key;
+      g.nested = nested;
+      g.node.style.setProperty("--lg-spec", 'url("' + maps.specURL + '")');
+      if (nested) {
+        if (g.filter) {
+          g.filter.remove();
+          g.filter = null;
+        }
+        g.node.style.removeProperty("--lg-filter");
+        g.node.classList.remove("is-refract", "is-glass-panel");
+        g.node.classList.add("is-glass-nested");
+        return;
+      }
+      const filter = buildFilter(g.id, w, h, maps, large);
       if (g.filter) g.filter.replaceWith(filter);
       else defs.appendChild(filter);
       g.filter = filter;
-      g.key = key;
-      g.node.style.setProperty("--lg-filter", "url(#" + g.id + ")");
-      g.node.style.setProperty("--lg-spec", 'url("' + maps.specURL + '")');
-      g.node.classList.add("is-refract");
+      g.node.classList.remove("is-glass-panel", "is-glass-nested");
+      setFilterActive(g, g.near);
     });
+  }
+
+  function setFilterActive(g, active) {
+    if (!g.filter || g.nested || reducedTransparency.matches) return;
+    if (active) {
+      g.node.style.setProperty("--lg-filter", "url(#" + g.id + ")");
+      g.node.classList.add("is-refract");
+    } else {
+      g.node.style.setProperty("--lg-filter", "none");
+      g.node.classList.remove("is-refract");
+    }
   }
 
   function disableAll() {
     glasses.forEach((g) => {
       g.token++;
       g.key = null;
-      g.node.classList.remove("is-refract");
+      g.node.classList.remove("is-refract", "is-glass-panel", "is-glass-nested");
       g.node.style.removeProperty("--lg-filter");
       g.node.style.removeProperty("--lg-spec");
     });
@@ -385,17 +485,23 @@
     });
   });
 
-  // Chỉ dựng map cho phần tử sắp vào màn hình
+  // Chỉ bật SVG filter khi phần tử nằm gần khung nhìn; tạm ngắt khi cuộn ra khỏi màn hình
+  // (giữ nguyên node <filter> trong bộ nhớ để bật lại tức thì không nháy)
   const nearObserver = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
         const g = byNode.get(entry.target);
         if (!g) return;
         g.near = entry.isIntersecting;
-        if (g.near) render(g);
+        if (g.near) {
+          if (g.key) setFilterActive(g, true);
+          render(g);
+        } else if (g.filter) {
+          setFilterActive(g, false);
+        }
       });
     },
-    { rootMargin: "50% 0px" }
+    { rootMargin: "15% 0px" }
   );
 
   glasses.forEach((g) => {

@@ -81,7 +81,8 @@ body.menu-open {
   padding-inline: clamp(14px, 3vw, 32px);
   z-index: 40;
   pointer-events: none;
-  animation: slideDown 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  contain: layout style;
+  animation: slideDown 0.7s cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 
 .header-inner {
@@ -294,6 +295,7 @@ body.menu-open {
 .subhead {
   margin: 0 0 clamp(20px, 3vh, 30px);
   font-weight: 400;
+  opacity: 0.8;
 }
 
 .subhead.anim {
@@ -304,21 +306,17 @@ body.menu-open {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  height: clamp(44px, 5.2vw, 48px);
   background: #ffffff;
   font-family: var(--font-sans);
   font-size: clamp(13.5px, 1.5vw, 14.5px);
-  padding: clamp(11px, 1.6vh, 13px) clamp(22px, 3vw, 28px);
+  padding: 0 clamp(22px, 3vw, 28px);
   border-radius: 999px;
   text-decoration: none;
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.15),
     0 0 22px rgba(255, 255, 255, 0.32),
     0 0 44px rgba(255, 255, 255, 0.12);
-  opacity: 0;
-  transform: translateY(22px) scale(0.98);
-  filter: blur(6px);
-  animation: revealPulse 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  animation-delay: var(--d, 0.4s);
 }
 
 .cta-btn:hover {
@@ -358,11 +356,7 @@ body.menu-open {
    ========================================================= */
 
 .anim {
-  opacity: 0;
-  transform: translateY(22px) scale(0.98);
-  filter: blur(6px);
-  animation: reveal 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  animation-delay: var(--d, 0s);
+  animation: reveal 0.85s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0s) backwards;
 }
 
 @keyframes slideDown {
@@ -395,8 +389,8 @@ body.menu-open {
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: blur(0);
+    transform: none;
+    filter: none;
   }
 }
 
@@ -408,8 +402,8 @@ body.menu-open {
   }
   to {
     opacity: 0.8;
-    transform: translateY(0) scale(1);
-    filter: blur(0);
+    transform: none;
+    filter: none;
   }
 }
 
@@ -422,12 +416,12 @@ body.menu-open {
   70% {
     opacity: 1;
     transform: translateY(-1px) scale(1.015);
-    filter: blur(0);
+    filter: none;
   }
   100% {
     opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: blur(0);
+    transform: none;
+    filter: none;
   }
 }
 
@@ -878,27 +872,20 @@ body.menu-open {
 
 .submit-pill {
   align-self: flex-start;
-  height: 44px;
-  padding-inline: 26px;
-  border-radius: 999px;
+  height: 46px;
+  padding-inline: 28px;
+  border-radius: 16px;
   border: none;
-  background: #ffffff;
-  color: #000000;
+  color: #ffffff;
   font-family: var(--font-sans);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.15),
-    0 0 20px rgba(255, 255, 255, 0.22);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .submit-pill:hover {
-  transform: translateY(-1px) scale(1.01);
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.25),
-    0 0 26px rgba(255, 255, 255, 0.36);
+  transform: none;
 }
 
 .form-status {
@@ -1061,18 +1048,15 @@ body.menu-open {
   --font-serif: "Be Vietnam Pro", "Segoe UI", system-ui, sans-serif;
 }
 
-/* Soft ambient light so the glass has something to refract */
-body {
-  background-attachment: fixed;
-}
-
 .content-section {
   background: transparent;
   border-top-color: rgba(255, 255, 255, 0.06);
+  contain: layout style;
 }
 
 .site-footer {
   background: transparent;
+  contain: layout style;
 }
 
 /* --- Shared glass surface --- */
@@ -1081,9 +1065,14 @@ body {
 .burger-btn,
 .cta-btn,
 .mobile-sheet,
+.mobile-lang-btn,
+.mobile-signin-btn,
 .about-photo-wrap,
 .skill-block,
+.bento-card,
 .contact-form,
+.submit-pill,
+.copy-btn,
 .dark-action-pill {
   position: relative;
   overflow: hidden;
@@ -1093,7 +1082,7 @@ body {
     linear-gradient(var(--glass-bg), var(--glass-bg)),
     linear-gradient(var(--glass-tint), var(--glass-tint)),
     var(--lg-spec) 0 0 / 100% 100% no-repeat;
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: var(--lg-filter);
   backdrop-filter: var(--lg-filter);
   border: none;
   box-shadow: var(--glass-shadow);
@@ -1113,9 +1102,14 @@ body {
 .burger-btn::before,
 .cta-btn::before,
 .mobile-sheet::before,
+.mobile-lang-btn::before,
+.mobile-signin-btn::before,
 .about-photo-wrap::before,
 .skill-block::before,
+.bento-card::before,
 .contact-form::before,
+.submit-pill::before,
+.copy-btn::before,
 .dark-action-pill::before {
   content: "";
   position: absolute;
@@ -1146,39 +1140,43 @@ body {
 
 /* ---- Không có backdrop-filter nào (trình duyệt rất cũ) → nền đặc ---- */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  :is(.nav-pill, .lang-pill, .burger-btn, .cta-btn, .mobile-sheet, .about-photo-wrap, .skill-block, .contact-form, .dark-action-pill) {
+  :is(.nav-pill, .lang-pill, .burger-btn, .cta-btn, .mobile-sheet, .mobile-lang-btn, .mobile-signin-btn, .about-photo-wrap, .skill-block, .bento-card, .contact-form, .submit-pill, .copy-btn, .dark-action-pill) {
     background: rgba(28, 28, 34, 0.88) !important;
   }
 }
 
 /* ---- Người dùng bật "Giảm độ trong suốt" trong hệ điều hành ---- */
 @media (prefers-reduced-transparency: reduce) {
-  :is(.nav-pill, .lang-pill, .burger-btn, .cta-btn, .mobile-sheet, .about-photo-wrap, .skill-block, .contact-form, .dark-action-pill) {
+  :is(.nav-pill, .lang-pill, .burger-btn, .cta-btn, .mobile-sheet, .mobile-lang-btn, .mobile-signin-btn, .about-photo-wrap, .skill-block, .bento-card, .contact-form, .submit-pill, .copy-btn, .dark-action-pill) {
     background: rgba(28, 28, 34, 0.92) !important;
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
   }
 
-  :is(.nav-pill, .lang-pill, .burger-btn, .cta-btn, .mobile-sheet, .about-photo-wrap, .skill-block, .contact-form, .dark-action-pill)::before {
+  :is(.nav-pill, .lang-pill, .burger-btn, .cta-btn, .mobile-sheet, .mobile-lang-btn, .mobile-signin-btn, .about-photo-wrap, .skill-block, .bento-card, .contact-form, .submit-pill, .copy-btn, .dark-action-pill)::before {
     display: none;
   }
 }
 
-/* Small frosted "glass pill" chips */
-.skill-pills li,
-.copy-btn {
+/* Small frosted "glass pill" chips (nằm trong khung kính .bento-profile đã là Backdrop Root
+   nên không cần thêm backdrop-filter riêng — tránh 9 lượt blur GPU thừa mỗi khung hình cuộn) */
+.skill-pills li {
   background: rgba(255, 255, 255, 0.04);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  backdrop-filter: blur(16px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: none !important;
 }
 
-/* --- Header --- */
+/* --- Header & Glass Buttons (đồng bộ độ mờ kính giống nút VI | EN) --- */
 
 .nav-pill,
 .lang-pill,
-.burger-btn {
+.burger-btn,
+.cta-btn,
+.dark-action-pill,
+.submit-pill,
+.copy-btn,
+.mobile-lang-btn,
+.mobile-signin-btn {
   --glass-blur: 22px;
 }
 
@@ -1236,14 +1234,13 @@ body {
 }
 
 .mobile-lang-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
   color: #ffffff;
 }
 
 .mobile-signin-btn {
-  background: #ffffff;
-  color: #000000;
+  --glass-tint: rgba(108, 132, 245, 0.28);
+  --glass-bg: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
   font-weight: 600;
 }
 
@@ -1292,6 +1289,9 @@ body {
 .about-photo-wrap {
   border-radius: 20px;
   padding: 3px;
+  /* Ảnh che kín 98% khung (chỉ lộ viền 3px) → tắt backdrop-filter lớn đỡ tốn GPU khi cuộn */
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 /* viền sáng của khung ảnh: mảnh hơn các thẻ kính khác */
@@ -1315,13 +1315,22 @@ body {
   border-color: rgba(255, 255, 255, 0.1);
 }
 
-.dark-action-pill:hover {
+.dark-action-pill:hover,
+.copy-btn:hover,
+.mobile-lang-btn:hover {
   --glass-bg: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
 }
 
-.copy-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
+/* Nút Gửi lời nhắn: kính lỏng màu xanh chàm dịu đồng bộ với khung & bo góc 16px */
+.submit-pill {
+  --glass-tint: rgba(108, 132, 245, 0.28);
+  --glass-bg: rgba(255, 255, 255, 0.08);
   color: #ffffff;
+}
+
+.submit-pill:hover {
+  --glass-bg: rgba(255, 255, 255, 0.16);
 }
 
 /* --- Skills & Contact --- */
@@ -1358,9 +1367,14 @@ body {
 .lang-pill:hover,
 .burger-btn:hover,
 .cta-btn:hover,
+.mobile-lang-btn:hover,
+.mobile-signin-btn:hover,
 .about-photo-wrap:hover,
 .skill-block:hover,
+.bento-card:hover,
 .contact-form:hover,
+.submit-pill:hover,
+.copy-btn:hover,
 .dark-action-pill:hover,
 .burger-btn[aria-expanded="true"] {
   background:
@@ -1451,6 +1465,7 @@ body {
   z-index: 0;
   pointer-events: none;
   display: block;
+  contain: strict;
 }
 
 main,
@@ -1465,6 +1480,8 @@ main,
    ========================================================= */
 :root {
   --header-bar-bg: rgba(6, 8, 10, 0.62);
+  --header-bar-border: rgba(255, 255, 255, 0.08);
+  --header-bar-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
   --header-bar-blur: 20px;
 }
 
@@ -1476,27 +1493,24 @@ main,
   /* phủ từ mép trên màn hình xuống dưới nav một chút */
   top: calc(-1 * clamp(16px, 2.4vh, 28px));
   bottom: calc(-1 * clamp(12px, 1.8vh, 18px));
-  background: var(--header-bar-bg);
-  -webkit-backdrop-filter: blur(var(--header-bar-blur)) saturate(160%);
-  backdrop-filter: blur(var(--header-bar-blur)) saturate(160%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-  opacity: 0;
-  transform: translateY(-8px);
-  transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  /* Không transition opacity/transform trên lớp có backdrop-filter phía sau
+     .nav-pill (dùng SVG backdrop-filter url(#lg-*)): trên Chromium, opacity < 1
+     khi đang chuyển động làm lớp kính phía trên đọc nền sai (nháy tối ở chế độ sáng). */
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  box-shadow: 0 10px 30px transparent;
+  transition: background-color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
   pointer-events: none;
   z-index: -1;
 }
 
-.site-header.is-scrolled::before {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Khi menu điện thoại mở, luôn hiện dải để nút menu dễ thấy */
+.site-header.is-scrolled::before,
 body.menu-open .site-header::before {
-  opacity: 1;
-  transform: translateY(0);
+  background: var(--header-bar-bg);
+  border-bottom-color: var(--header-bar-border);
+  box-shadow: var(--header-bar-shadow);
+  -webkit-backdrop-filter: blur(var(--header-bar-blur)) saturate(160%);
+  backdrop-filter: blur(var(--header-bar-blur)) saturate(160%);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1517,6 +1531,7 @@ body.menu-open .site-header::before {
   z-index: 0;
   display: block;
   pointer-events: none;
+  contain: strict;
 }
 
 /* Trình duyệt không có WebGL: dải tím-xanh tĩnh bằng CSS */
@@ -1534,6 +1549,7 @@ body.menu-open .site-header::before {
    ========================================================= */
 :root {
   --btn-glow: 1.5;          /* 0.5 = dịu, 1.5 = rất rực */
+  --btn-glow-rgb: 255, 255, 255; /* màu quầng sáng xung quanh nút */
   --btn-glow-speed: 2s; /* nhịp sáng lên / dịu xuống */
 }
 
@@ -1576,19 +1592,10 @@ body.menu-open .site-header::before {
   filter: brightness(1.08);
   box-shadow:
     inset 0 1px 1px rgba(255, 255, 255, 0.25),
-    0 0 0 1px rgba(255, 255, 255, calc(0.26 * var(--btn-glow))),
-    0 0 18px rgba(255, 255, 255, calc(0.42 * var(--btn-glow))),
-    0 0 44px rgba(255, 255, 255, calc(0.18 * var(--btn-glow)));
+    0 0 0 1px rgba(var(--btn-glow-rgb), calc(0.26 * var(--btn-glow))),
+    0 0 18px rgba(var(--btn-glow-rgb), calc(0.42 * var(--btn-glow))),
+    0 0 44px rgba(var(--btn-glow-rgb), calc(0.18 * var(--btn-glow)));
   animation: btnGlowPulse var(--btn-glow-speed) ease-in-out infinite alternate;
-}
-
-/* CTA relies on its entrance animation (revealPulse, fill forwards) to be visible.
-   Keep it in the list so it is NOT replaced/restarted on hover; add the twinkle alongside. */
-.cta-btn:hover,
-.cta-btn:focus-visible {
-  animation:
-    revealPulse 0.9s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0.4s) forwards,
-    btnGlowPulse var(--btn-glow-speed) ease-in-out infinite alternate;
 }
 
 /* gentle twinkle: the halo breathes brighter / softer */
@@ -1596,16 +1603,16 @@ body.menu-open .site-header::before {
   from {
     box-shadow:
       inset 0 1px 1px rgba(255, 255, 255, 0.22),
-      0 0 0 1px rgba(255, 255, 255, calc(0.22 * var(--btn-glow))),
-      0 0 14px rgba(255, 255, 255, calc(0.32 * var(--btn-glow))),
-      0 0 34px rgba(255, 255, 255, calc(0.12 * var(--btn-glow)));
+      0 0 0 1px rgba(var(--btn-glow-rgb), calc(0.22 * var(--btn-glow))),
+      0 0 14px rgba(var(--btn-glow-rgb), calc(0.32 * var(--btn-glow))),
+      0 0 34px rgba(var(--btn-glow-rgb), calc(0.12 * var(--btn-glow)));
   }
   to {
     box-shadow:
       inset 0 1px 1px rgba(255, 255, 255, 0.3),
-      0 0 0 1px rgba(255, 255, 255, calc(0.34 * var(--btn-glow))),
-      0 0 26px rgba(255, 255, 255, calc(0.55 * var(--btn-glow))),
-      0 0 60px rgba(255, 255, 255, calc(0.26 * var(--btn-glow)));
+      0 0 0 1px rgba(var(--btn-glow-rgb), calc(0.34 * var(--btn-glow))),
+      0 0 26px rgba(var(--btn-glow-rgb), calc(0.55 * var(--btn-glow))),
+      0 0 60px rgba(var(--btn-glow-rgb), calc(0.26 * var(--btn-glow)));
   }
 }
 
@@ -1664,21 +1671,14 @@ html {
   height: 100%;
   transform: scaleX(0);
   transform-origin: 0 50%;
+  will-change: transform;
   background: linear-gradient(90deg, #a142f4, #7c4dff, #4285f4, #24c1e0);
   box-shadow: 0 0 10px rgba(124, 77, 255, 0.6);
 }
 
 /* ---------- HERO ---------- */
-.page {
-  --hero-p: 0; /* 0 → 1 while scrolling past the hero (set by main.js) */
-}
-
-.page .hero,
-.page .hero-facts {
-  transform: translate3d(0, calc(var(--hero-p) * -70px), 0);
-  opacity: calc(1 - var(--hero-p) * 1.15);
-  will-change: transform, opacity;
-}
+/* main.js cập nhật transform/opacity trực tiếp lên #heroContent và #heroFacts khi cuộn (> 2px)
+   để không tạo Backdrop Root lúc ở đầu trang và không ép tính lại style cho toàn bộ phần tử con. */
 
 .headline {
   font-size: clamp(46px, 9.5vw, 128px);
@@ -1787,8 +1787,8 @@ html {
 }
 
 .hero-secondary {
-  height: auto;
-  padding: clamp(11px, 1.6vh, 13px) clamp(20px, 2.6vw, 26px);
+  height: clamp(44px, 5.2vw, 48px);
+  padding: 0 clamp(20px, 2.6vw, 26px);
   font-size: clamp(13.5px, 1.5vw, 14.5px);
 }
 
@@ -1821,31 +1821,26 @@ html {
 }
 
 /* ---------- smoother scroll reveal ---------- */
-/* uses the individual "translate" property so hover "transform" effects stay independent */
+/* Chỉ chuyển động opacity + translate (thuần GPU compositor), tránh filter: blur() trên các thẻ kính lớn gây khựng lúc cuộn */
 .reveal-on-scroll {
   transform: none;
-  translate: 0 28px;
-  filter: blur(6px);
+  translate: 0 24px;
   transition:
-    opacity 0.9s var(--ease-out),
-    translate 0.9s var(--ease-out),
-    filter 0.9s ease;
+    opacity 0.75s var(--ease-out),
+    translate 0.75s var(--ease-out);
 }
 
 .reveal-on-scroll.is-visible {
   translate: 0 0;
-  filter: none;
 }
 
 .reveal-group .reveal-item {
   --rd: calc(var(--i, 0) * 90ms);
   opacity: 0;
-  translate: 0 26px;
-  filter: blur(6px);
+  translate: 0 22px;
   transition:
-    opacity 0.8s var(--ease-out) var(--rd),
-    translate 0.8s var(--ease-out) var(--rd),
-    filter 0.8s ease var(--rd),
+    opacity 0.7s var(--ease-out) var(--rd),
+    translate 0.7s var(--ease-out) var(--rd),
     transform 0.35s var(--ease-out),
     background 0.3s ease;
 }
@@ -1853,7 +1848,6 @@ html {
 .reveal-group.is-visible .reveal-item {
   opacity: 1;
   translate: 0 0;
-  filter: none;
 }
 
 /* ---------- shared card bits ---------- */
@@ -2120,14 +2114,21 @@ html {
   --border-strong: rgba(22, 22, 28, 0.22);
   --trust-border: rgba(22, 22, 28, 0.3);
 
-  /* kính: lớp trắng mờ thay cho lớp tối */
-  --glass-tint: rgba(255, 255, 255, 0.34);
-  --glass-bg: rgba(255, 255, 255, 0.2);
+  /* kính: lớp kính khói tối nhẹ để nổi khối rõ trên nền sáng (tăng alpha nếu muốn tối thêm) */
+  --glass-tint: rgba(171, 171, 171, 0.26);
+  --glass-bg: rgba(20, 22, 30, 0.06);
+  --glass-edge: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.65) 0%, rgba(255, 255, 255, 0.18) 18%, rgba(20, 22, 30, 0.06) 45%,
+    rgba(20, 22, 30, 0.12) 72%, rgba(255, 255, 255, 0.35) 100%);
   --glass-shadow:
-    inset 0 1px 0.5px rgba(255, 255, 255, 0.9),
-    inset 0 -1px 0.5px rgba(255, 255, 255, 0.35),
-    0 6px 20px rgba(20, 20, 30, 0.08);
+    inset 0 1px 0.5px rgba(255, 255, 255, 0.55),
+    inset 0 -1px 0.5px rgba(15, 16, 22, 0.16),
+    0 8px 24px rgba(15, 16, 24, 0.14);
   --header-bar-bg: rgba(236, 236, 240, 0.72);
+  --header-bar-border: rgba(22, 22, 28, 0.08);
+  --header-bar-shadow: 0 10px 30px rgba(20, 20, 30, 0.06);
+  --btn-glow-rgb: 22, 24, 34; /* quầng khi hover đổi sang màu tối trên nền sáng */
+  --btn-glow: 0.95;
 }
 
 [data-theme="light"] body {
@@ -2150,8 +2151,13 @@ html {
 [data-theme="light"] .mobile-sheet,
 [data-theme="light"] .mobile-link.active,
 [data-theme="light"] .mobile-lang-btn,
+[data-theme="light"] .mobile-lang-btn:hover,
+[data-theme="light"] .mobile-signin-btn,
+[data-theme="light"] .mobile-signin-btn:hover,
 [data-theme="light"] .cta-btn,
 [data-theme="light"] .dark-action-pill,
+[data-theme="light"] .submit-pill,
+[data-theme="light"] .submit-pill:hover,
 [data-theme="light"] .about-lead,
 [data-theme="light"] .fact-row dd,
 [data-theme="light"] .hero-fact-title,
@@ -2173,6 +2179,7 @@ html {
 [data-theme="light"] .cta-btn:hover,
 [data-theme="light"] .about-photo-wrap:hover,
 [data-theme="light"] .skill-block:hover,
+[data-theme="light"] .bento-card:hover,
 [data-theme="light"] .contact-form:hover,
 [data-theme="light"] .dark-action-pill:hover,
 [data-theme="light"] .burger-btn[aria-expanded="true"] {
@@ -2268,59 +2275,62 @@ html {
   border-top-color: rgba(22, 22, 28, 0.12);
 }
 
-[data-theme="light"] .skill-pills li,
-[data-theme="light"] .copy-btn,
-[data-theme="light"] .mobile-lang-btn {
-  background: rgba(255, 255, 255, 0.45);
-  border-color: rgba(22, 22, 28, 0.12);
+[data-theme="light"] .nav-link {
+  opacity: 0.72;
+}
+
+[data-theme="light"] .nav-link:hover,
+[data-theme="light"] .nav-link.active {
+  opacity: 1;
+}
+
+[data-theme="light"] .skill-pills li {
+  background: rgba(20, 22, 30, 0.08);
+  border-color: rgba(22, 22, 28, 0.16);
 }
 
 [data-theme="light"] .skill-pills li.is-primary {
   background: linear-gradient(90deg, rgba(161, 66, 244, 0.18), rgba(66, 133, 244, 0.18));
 }
 
-[data-theme="light"] .copy-btn:hover {
-  background: rgba(255, 255, 255, 0.7);
-}
-
 [data-theme="light"] .research-note {
-  background: rgba(255, 255, 255, 0.4);
-  border-color: rgba(22, 22, 28, 0.1);
+  background: rgba(20, 22, 30, 0.08);
+  border-color: rgba(22, 22, 28, 0.14);
 }
 
 [data-theme="light"] .form-field input,
 [data-theme="light"] .form-field textarea {
-  background: rgba(255, 255, 255, 0.45);
-  border-color: rgba(22, 22, 28, 0.16);
+  background: rgba(255, 255, 255, 0.32);
+  border-color: rgba(22, 22, 28, 0.14);
 }
 
 [data-theme="light"] .form-field input:focus,
 [data-theme="light"] .form-field textarea:focus {
-  background: rgba(255, 255, 255, 0.7);
-  border-color: rgba(22, 22, 28, 0.4);
+  background: rgba(255, 255, 255, 0.58);
+  border-color: rgba(22, 22, 28, 0.36);
 }
 
-[data-theme="light"] .site-header::before {
-  border-bottom-color: rgba(22, 22, 28, 0.08);
-  box-shadow: 0 10px 30px rgba(20, 20, 30, 0.06);
-}
-
-/* --- nút nền đặc: trắng/chữ đen → xám đen/chữ trắng --- */
-[data-theme="light"] .mobile-signin-btn,
+/* --- nút chính ở chế độ sáng: kính lỏng xanh chàm dịu đồng bộ với khung --- */
 [data-theme="light"] .submit-pill,
+[data-theme="light"] .mobile-signin-btn {
+  --glass-tint: rgba(68, 86, 178, 0.24);
+  --glass-bg: rgba(255, 255, 255, 0.14);
+  color: #161b30;
+}
+
 [data-theme="light"] .light-action-pill {
   background: #1c1c22;
   color: #f4f4f6;
 }
 
-/* --- menu điện thoại: kính sáng --- */
+/* --- menu điện thoại: kính khói đằm màu hơn --- */
 [data-theme="light"] .mobile-sheet {
-  --glass-tint: rgba(246, 246, 249, 0.78);
-  box-shadow: var(--glass-shadow), 0 20px 60px rgba(20, 20, 30, 0.16);
+  --glass-tint: rgba(205, 207, 215, 0.86);
+  box-shadow: var(--glass-shadow), 0 20px 60px rgba(20, 20, 30, 0.2);
 }
 
 [data-theme="light"] .mobile-overlay {
-  background: rgba(30, 30, 36, 0.25);
+  background: rgba(30, 30, 36, 0.28);
 }
 
 /* --- trình duyệt không có WebGL: cực quang tĩnh màu xám --- */
@@ -2339,17 +2349,430 @@ html {
 
 /* --- nền đặc khi không có backdrop-filter / giảm độ trong suốt --- */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  [data-theme="light"] :is(.nav-pill, .lang-pill, .burger-btn, .cta-btn, .mobile-sheet, .about-photo-wrap, .skill-block, .contact-form, .dark-action-pill) {
-    background: rgba(242, 242, 245, 0.92) !important;
+  [data-theme="light"] :is(.nav-pill, .lang-pill, .burger-btn, .cta-btn, .mobile-sheet, .mobile-lang-btn, .mobile-signin-btn, .about-photo-wrap, .skill-block, .bento-card, .contact-form, .submit-pill, .copy-btn, .dark-action-pill) {
+    background: rgba(204, 206, 214, 0.92) !important;
   }
 }
 
 @media (prefers-reduced-transparency: reduce) {
-  [data-theme="light"] :is(.nav-pill, .lang-pill, .burger-btn, .cta-btn, .mobile-sheet, .about-photo-wrap, .skill-block, .contact-form, .dark-action-pill) {
-    background: rgba(242, 242, 245, 0.95) !important;
+  [data-theme="light"] :is(.nav-pill, .lang-pill, .burger-btn, .cta-btn, .mobile-sheet, .mobile-lang-btn, .mobile-signin-btn, .about-photo-wrap, .skill-block, .bento-card, .contact-form, .submit-pill, .copy-btn, .dark-action-pill) {
+    background: rgba(204, 206, 214, 0.95) !important;
   }
 
   [data-theme="light"] .headline-line.line-1 {
     color: #1c1c22;
+  }
+}
+
+
+/* =========================================================
+   ENGINEERING BENTO LAYOUT (Software Engineer / IT Portfolio)
+   Giữ nguyên 3 mục (Hero, Giới thiệu, Liên hệ) + Aurora + Liquid Glass
+   ========================================================= */
+:root {
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.container {
+  max-width: 1080px;
+}
+
+.section-kicker,
+.section-meta,
+.stat-kicker,
+.bento-kicker,
+.caption-role,
+.profile-handle,
+.hero-status {
+  font-family: var(--font-mono);
+}
+
+/* --- Hero: trạng thái sẵn sàng + nút dev + dải spec 4 ô --- */
+.hero-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: clamp(10px, 1.8vh, 18px);
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.82);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+/* Chấm trạng thái: dùng ::after transform + opacity thuần GPU compositor thay cho box-shadow animation
+   (box-shadow animation ép trình duyệt repaint main-thread 60-120 lần/giây ngay cả khi đã cuộn khỏi Hero) */
+.status-dot {
+  position: relative;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #34d399;
+  flex-shrink: 0;
+}
+
+.status-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: inherit;
+  opacity: 0.6;
+  animation: statusPulse 2.4s ease-out infinite;
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+
+@keyframes statusPulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  70% {
+    transform: scale(2.8);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2.8);
+    opacity: 0;
+  }
+}
+
+.hero-icon-pill {
+  height: clamp(44px, 5.2vw, 48px);
+  padding: 0 20px;
+  font-size: clamp(13.5px, 1.5vw, 14.5px);
+}
+
+.stats-footer.hero-facts {
+  max-width: 1040px;
+  gap: 12px;
+  text-align: left;
+}
+
+.hero-facts .stat-item {
+  align-items: flex-start;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-top-color: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.03);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+.stat-kicker {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.45);
+  margin-bottom: 2px;
+}
+
+/* --- Section Header Split --- */
+.section-header-split {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px 28px;
+  flex-wrap: wrap;
+}
+
+.section-meta {
+  margin: 0 0 14px;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* --- Shared Bento Card (cùng bán kính bo & kính lỏng như .contact-form) --- */
+.bento-card {
+  padding: clamp(22px, 3.2vw, 32px);
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.bento-kicker {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.48);
+}
+
+/* --- 01 // ABOUT: Ảnh chân dung + 1 khung kính lỏng gộp chung hồ sơ --- */
+.about-bento {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 18px;
+  align-items: stretch;
+}
+
+.bento-photo {
+  grid-column: 1 / span 4;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-radius: 24px;
+}
+
+.bento-photo .about-photo {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  min-height: 360px;
+  aspect-ratio: auto;
+  object-fit: cover;
+  object-position: center 24%;
+  border-radius: 21px;
+}
+
+.bento-photo-caption {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: rgba(12, 12, 18, 0.56);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+.caption-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.caption-role {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.bento-profile {
+  grid-column: 5 / span 8;
+  justify-content: space-between;
+}
+
+.profile-intro {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.profile-intro .about-lead {
+  margin: 0;
+  font-size: clamp(18px, 2vw, 23px);
+}
+
+.profile-intro .about-text {
+  margin: 0;
+  max-width: 68ch;
+  font-size: 14.5px;
+}
+
+.profile-subgrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.profile-subcol {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.profile-subcol .skill-pills {
+  gap: 8px;
+}
+
+.profile-subcol .about-facts {
+  margin: 0;
+  border-top: none;
+}
+
+.profile-subcol .fact-row {
+  padding: 9px 0;
+  font-size: 13.5px;
+}
+
+.profile-subcol .fact-row:first-child {
+  padding-top: 0;
+}
+
+.profile-subcol .fact-row:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+/* --- 02 // CONTACT: Kênh liên hệ mở (không khung) + khung kính Gửi lời nhắn --- */
+.contact-grid {
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: clamp(28px, 4.5vw, 56px);
+  align-items: start;
+}
+
+.contact-channels {
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.contact-channels .channel-socials {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.social-pill {
+  height: 40px;
+  padding-inline: 18px;
+  font-size: 13.5px;
+}
+
+.contact-form {
+  gap: 16px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+/* --- Light Mode Parity for Engineering Bento --- */
+[data-theme="light"] .hero-status {
+  color: #1c1c22;
+  background: rgba(255, 255, 255, 0.55);
+  border-color: rgba(22, 22, 28, 0.14);
+}
+
+[data-theme="light"] .status-dot {
+  background: #059669;
+}
+
+[data-theme="light"] .hero-facts .stat-item {
+  border-color: rgba(22, 22, 28, 0.12);
+  border-top-color: rgba(22, 22, 28, 0.18);
+  background: rgba(255, 255, 255, 0.42);
+}
+
+[data-theme="light"] .stat-kicker,
+[data-theme="light"] .bento-kicker {
+  color: rgba(28, 28, 34, 0.54);
+}
+
+[data-theme="light"] .section-meta {
+  color: rgba(28, 28, 34, 0.68);
+  background: rgba(255, 255, 255, 0.48);
+  border-color: rgba(22, 22, 28, 0.12);
+}
+
+[data-theme="light"] .bento-photo-caption {
+  background: rgba(244, 244, 248, 0.78);
+  border-color: rgba(22, 22, 28, 0.12);
+}
+
+[data-theme="light"] .caption-name {
+  color: #1c1c22;
+}
+
+[data-theme="light"] .caption-role {
+  color: rgba(28, 28, 34, 0.68);
+}
+
+[data-theme="light"] .profile-handle {
+  color: rgba(28, 28, 34, 0.58);
+}
+
+/* --- Responsive: Tablet & Mobile --- */
+@media (max-width: 960px) {
+  .about-bento {
+    grid-template-columns: 1fr;
+  }
+
+  .bento-photo,
+  .bento-profile {
+    grid-column: 1;
+  }
+
+  .bento-photo {
+    max-width: 380px;
+  }
+
+  .bento-photo .about-photo {
+    min-height: 300px;
+    aspect-ratio: 4 / 5;
+  }
+
+  .contact-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .page {
+    height: auto;
+    min-height: 100dvh;
+    gap: 24px;
+  }
+
+  .hero-status {
+    font-size: 10.5px;
+    padding: 5px 12px;
+  }
+
+  .stats-footer.hero-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .hero-facts .stat-item {
+    padding: 12px 13px;
+  }
+
+  .profile-subgrid {
+    grid-template-columns: 1fr;
+  }
+
+  .section-meta {
+    margin-bottom: 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status-dot::after {
+    animation: none;
+    display: none;
   }
 }

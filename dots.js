@@ -40,7 +40,10 @@
     lightTarget = isLight() ? 1 : 0;
     if (reduce) {
       light = lightTarget;
-      paint(start + INTRO_MS, null);
+      setCanvasVisible(light < 1);
+      if (light < 1) paint(start + INTRO_MS, null);
+    } else {
+      wake();
     }
   });
 
@@ -183,16 +186,28 @@
     if (box) ctx.restore();
   }
 
+  let rafId = 0;
+  let canvasHidden = false;
+  function setCanvasVisible(visible) {
+    if (visible === !canvasHidden) return;
+    canvasHidden = !visible;
+    canvas.style.visibility = visible ? "" : "hidden";
+  }
+
   function frame(now) {
     const themeMoving = step(now);
     const lensOn = lens.k > LENS_OFF;
+    const introRunning = now - start < introEnd;
+    const mouseActive = mouse.inside && now - mouse.last < IDLE_MS;
 
     // cả màn hình đổi: đang hiện lan, đang chuyển sáng/tối, vừa đổi kích thước
-    if (needFull || themeMoving || now - start < introEnd) {
+    if (needFull || themeMoving || introRunning) {
+      setCanvasVisible(true);
       paint(now, null);
       needFull = false;
       prevBox = lensOn ? lensBox() : null;
     } else if (lensOn) {
+      setCanvasVisible(true);
       // lens đứng yên hẳn (chuột không di chuyển) → hình không đổi, bỏ qua
       const still = Math.abs(lens.x - last.x) < 0.01 && Math.abs(lens.y - last.y) < 0.01 && Math.abs(lens.k - last.k) < 0.0005;
       if (!still) {
@@ -201,20 +216,39 @@
         prevBox = box;
       }
     } else if (prevBox) {
+      setCanvasVisible(true);
       paint(now, prevBox); // lens vừa tắt: trả vùng cũ về lưới chấm tĩnh
       prevBox = null;
     }
     last.x = lens.x;
     last.y = lens.y;
     last.k = lens.k;
+
+    const busy = needFull || themeMoving || introRunning || lensOn || mouseActive || prevBox !== null;
+    // Ở chế độ sáng khi đứng yên (LIGHT_BASE = 0): ẩn lớp canvas trống khỏi compositor GPU
+    if (!busy && light >= 0.999 && LIGHT_BASE === 0) {
+      setCanvasVisible(false);
+    }
+    return busy;
   }
 
   function loop(now) {
-    frame(now);
-    requestAnimationFrame(loop);
+    rafId = 0;
+    if (document.visibilityState === "hidden") return;
+    if (frame(now)) {
+      rafId = requestAnimationFrame(loop);
+    }
   }
 
-  window.addEventListener("resize", resize);
+  function wake() {
+    if (reduce || document.visibilityState === "hidden") return;
+    if (!rafId) rafId = requestAnimationFrame(loop);
+  }
+
+  window.addEventListener("resize", () => {
+    resize();
+    wake();
+  });
   window.addEventListener(
     "pointermove",
     (e) => {
@@ -222,13 +256,21 @@
       mouse.y = e.clientY;
       mouse.last = performance.now();
       mouse.inside = true;
+      wake();
     },
     { passive: true }
   );
   document.documentElement.addEventListener("pointerleave", () => {
     mouse.inside = false;
   });
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") wake();
+  });
 
   resize();
-  if (!reduce) requestAnimationFrame(loop);
+  if (reduce) {
+    setCanvasVisible(light < 1);
+  } else {
+    wake();
+  }
 })();

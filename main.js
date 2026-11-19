@@ -23,16 +23,16 @@
       "hero.cta": "Xem năng lực",
       "hero.cta2": "Liên hệ",
 
-      "facts.f1": "Backend chủ lực",
+      "facts.f1": "Full Stack chủ lực",
       "facts.f2": "Cơ sở dữ liệu quan hệ",
       "facts.f3Title": "Thiết kế hệ thống",
       "facts.f3": "API phân tầng · đồng thời",
       "facts.f4Title": "Đại học Sài Gòn",
       "facts.f4": "CNTT · 2022 – nay",
 
-      "about.title": "Xây backend chắc chắn, hiểu rõ từng quyết định.",
+      "about.title": "Xây hệ thống Full Stack chắc chắn, hiểu rõ từng quyết định.",
       "about.lead":
-        "Sinh viên năm cuối ngành Công nghệ Thông tin tại Đại học Sài Gòn, định hướng Backend / Software Engineer.",
+        "Sinh viên năm cuối ngành Công nghệ Thông tin tại Đại học Sài Gòn, định hướng Full Stack / Software Engineer.",
       "about.p1":
         "Thế mạnh của tôi là Java và Spring Boot: thiết kế RESTful API theo kiến trúc phân tầng, mô hình hoá dữ liệu trên PostgreSQL / MySQL và đảm bảo hệ thống vẫn chạy đúng khi nhiều người dùng thao tác cùng lúc.",
       "about.p2":
@@ -40,8 +40,13 @@
       "about.f1Label": "Học vấn",
       "about.f1Val": "Đại học Sài Gòn — CNTT (2022 – nay)",
       "about.f2Label": "Định hướng",
-      "about.f2Val": "Backend · Software Engineer",
+      "about.f2Val": "Full Stack · Software Engineer",
       "about.f3Label": "Công nghệ chính",
+      "about.kickerBio": "HỒ SƠ",
+      "about.kickerStack": "CÔNG NGHỆ CHÍNH",
+      "about.kickerSpecs": "THÔNG TIN",
+      "about.goalLabel": "Mục tiêu",
+      "about.goalVal": "Fresher Software Developer",
       "about.f4Label": "Khu vực",
       "about.f4Val": "TP. Hồ Chí Minh",
       "about.contactBtn": "Liên hệ trực tiếp",
@@ -50,7 +55,7 @@
       "skills.subtitle":
         "Java là ngôn ngữ chính; các công nghệ còn lại giúp tôi đi trọn vòng đời một tính năng — từ thiết kế dữ liệu đến kiểm thử và đóng gói.",
       "skills.g1": "Ngôn ngữ",
-      "skills.g2": "Backend & Framework",
+      "skills.g2": "Full Stack & Framework",
       "skills.g3": "Cơ sở dữ liệu",
       "skills.g4": "Kiểm thử & Công cụ",
       "skills.g5": "Đang tìm hiểu & đã làm quen",
@@ -98,6 +103,7 @@
       "contact.socialLabel": "MẠNG XÃ HỘI",
       "contact.locLabel": "KHU VỰC",
       "contact.locVal": "TP. Hồ Chí Minh, Việt Nam",
+      "contact.formKicker": "GỬI LỜI NHẮN",
       "contact.nameLabel": "Họ và tên của bạn",
       "contact.namePh": "Nguyễn Văn A",
       "contact.emailLabel": "Địa chỉ Email",
@@ -131,16 +137,16 @@
       "hero.cta": "See my expertise",
       "hero.cta2": "Contact",
 
-      "facts.f1": "Primary backend stack",
+      "facts.f1": "Primary full-stack",
       "facts.f2": "Relational databases",
       "facts.f3Title": "System design",
       "facts.f3": "Layered APIs · concurrency",
       "facts.f4Title": "Saigon University",
       "facts.f4": "IT · 2022 – present",
 
-      "about.title": "Building solid backends, understanding every decision.",
+      "about.title": "Building solid full-stack systems, understanding every decision.",
       "about.lead":
-        "Final-year Information Technology student at Saigon University, focused on Backend / Software Engineering.",
+        "Final-year Information Technology student at Saigon University, focused on Full Stack / Software Engineering.",
       "about.p1":
         "My core strength is Java and Spring Boot: designing RESTful APIs with a layered architecture, modelling data in PostgreSQL / MySQL, and keeping systems correct when many users act at the same time.",
       "about.p2":
@@ -148,8 +154,13 @@
       "about.f1Label": "Education",
       "about.f1Val": "Saigon University — IT (2022 – present)",
       "about.f2Label": "Focus",
-      "about.f2Val": "Backend · Software Engineer",
+      "about.f2Val": "Full Stack · Software Engineer",
       "about.f3Label": "Core stack",
+      "about.kickerBio": "PROFILE",
+      "about.kickerStack": "CORE STACK",
+      "about.kickerSpecs": "SPECS",
+      "about.goalLabel": "Target role",
+      "about.goalVal": "Fresher Software Developer",
       "about.f4Label": "Location",
       "about.f4Val": "Ho Chi Minh City",
       "about.contactBtn": "Get in touch",
@@ -158,7 +169,7 @@
       "skills.subtitle":
         "Java is my primary language; the rest lets me take a feature through its whole lifecycle — from data design to testing and packaging.",
       "skills.g1": "Languages",
-      "skills.g2": "Backend & Frameworks",
+      "skills.g2": "Full Stack & Frameworks",
       "skills.g3": "Databases",
       "skills.g4": "Testing & Tools",
       "skills.g5": "Familiar with & exploring",
@@ -205,6 +216,7 @@
       "contact.socialLabel": "PROFILES",
       "contact.locLabel": "LOCATION",
       "contact.locVal": "Ho Chi Minh City, Vietnam",
+      "contact.formKicker": "SEND MESSAGE",
       "contact.nameLabel": "Your name",
       "contact.namePh": "Alex Nguyen",
       "contact.emailLabel": "Email address",
@@ -274,6 +286,7 @@
 
   function toggleLanguage() {
     applyLanguage(currentLang === "vi" ? "en" : "vi");
+    if (typeof measureMetrics === "function") measureMetrics();
   }
 
   const langBtnDesktop = document.getElementById("langToggleDesktop");
@@ -427,6 +440,8 @@
   const siteHeader = document.querySelector(".site-header");
   const progressBar = document.getElementById("scrollProgress");
   const heroSection = document.getElementById("home");
+  const heroContent = document.getElementById("heroContent");
+  const heroFacts = document.getElementById("heroFacts");
 
   // Small text-level blocks, so each line dims on its own as it reaches the top.
   // Opacity is set with !important only while dimming: that beats the entrance
@@ -436,30 +451,57 @@
     ".hero-facts > *",
     ".section-header > *",
     ".about-photo",
-    ".about-body > *",
-    ".contact-info > *",
+    ".profile-intro > *",
+    ".profile-subgrid",
+    ".contact-channels > *",
     ".contact-form > *",
   ].join(",");
   const fadeEls = Array.from(document.querySelectorAll(FADE_SELECTOR));
   const FADE_MIN = 0.15; // how dim text gets once it has passed under the nav
   const dimmed = new Map(); // phần tử đang mờ → độ mờ đã ghi
 
-  function fadeLine() {
-    // bottom edge of the nav (+ a little air) — text starts dimming when it reaches it
-    return siteHeader ? siteHeader.getBoundingClientRect().bottom + 6 : 90;
+  // Cache kích thước cố định lúc cuộn (chỉ đo lại khi resize / tải xong / đổi ngôn ngữ)
+  let vh = window.innerHeight || 1;
+  let docMax = Math.max(0, document.documentElement.scrollHeight - vh);
+  let fadeZ = 90;
+  function measureMetrics() {
+    vh = window.innerHeight || 1;
+    docMax = Math.max(0, document.documentElement.scrollHeight - vh);
+    fadeZ = siteHeader ? siteHeader.getBoundingClientRect().bottom + 6 : 90;
   }
 
   let ticking = false;
   // Giá trị đã ghi lần trước: chỉ ghi lại khi đổi → không bắt trình duyệt tính lại style vô ích
+  let lastScrollY = -1;
   let lastProgress = "";
-  let lastHeroP = "";
+  let lastHeroP = -1;
   let lastScrolled = null;
-  function onScrollFrame() {
+  function onScrollFrame(force) {
+    // --- PHA 1: CHỈ ĐỌC (không có ghi DOM nào trước đây → không bao giờ ép reflow) ---
     const y = window.scrollY;
-    const vh = window.innerHeight;
-    const max = document.documentElement.scrollHeight - vh;
+    if (!force && y === lastScrollY) {
+      ticking = false;
+      return;
+    }
+    lastScrollY = y;
+    const z = fadeZ;
+    const updates = [];
+    for (let i = 0; i < fadeEls.length; i++) {
+      const el = fadeEls[i];
+      const r = el.getBoundingClientRect();
+      if (r.height === 0) continue;
+      if (r.top < z) {
+        const p = Math.min(1, (z - r.top) / r.height);
+        // Làm tròn bước 0.02 giúp giảm một nửa số lần ghi style vào phần tử con trong khung kính
+        const o = (Math.round((1 - (1 - FADE_MIN) * p) * 50) / 50).toFixed(2);
+        if (dimmed.get(el) !== o) updates.push(el, o);
+      } else if (dimmed.has(el)) {
+        updates.push(el, null);
+      }
+    }
 
-    const progress = `scaleX(${max > 0 ? Math.min(1, y / max).toFixed(4) : 0})`;
+    // --- PHA 2: CHỈ GHI ---
+    const progress = `scaleX(${docMax > 0 ? Math.min(1, y / docMax).toFixed(4) : 0})`;
     if (progressBar && progress !== lastProgress) {
       progressBar.style.transform = progress;
       lastProgress = progress;
@@ -470,26 +512,37 @@
       lastScrolled = scrolled;
     }
     if (heroSection && !prefersReducedMotion) {
-      const heroP = Math.min(1, y / (vh * 0.9)).toFixed(4);
-      if (heroP !== lastHeroP) {
-        heroSection.style.setProperty("--hero-p", heroP);
-        lastHeroP = heroP;
+      const heroP = y > 2 ? Math.min(1, y / (vh * 0.9)) : 0;
+      const heroPRounded = Math.round(heroP * 1000) / 1000;
+      if (heroPRounded !== lastHeroP) {
+        lastHeroP = heroPRounded;
+        if (heroPRounded === 0) {
+          if (heroContent) {
+            heroContent.style.removeProperty("transform");
+            heroContent.style.removeProperty("opacity");
+          }
+          if (heroFacts) {
+            heroFacts.style.removeProperty("transform");
+            heroFacts.style.removeProperty("opacity");
+          }
+        } else {
+          const tf = `translate3d(0, ${(-heroPRounded * 70).toFixed(1)}px, 0)`;
+          const op = Math.max(0, 1 - heroPRounded * 1.15).toFixed(3);
+          if (heroContent) {
+            heroContent.style.transform = tf;
+            heroContent.style.opacity = op;
+          }
+          if (heroFacts) {
+            heroFacts.style.transform = tf;
+            heroFacts.style.opacity = op;
+          }
+        }
       }
     }
 
-    // read all positions first, then write (avoids layout thrashing)
-    const z = fadeLine();
-    const updates = [];
-    fadeEls.forEach((el) => {
-      const r = el.getBoundingClientRect();
-      if (r.height === 0) return;
-      const p = Math.min(1, Math.max(0, (z - r.top) / r.height)); // 0 = below the nav, 1 = fully passed
-      if (p > 0) {
-        const o = (1 - (1 - FADE_MIN) * p).toFixed(3);
-        if (dimmed.get(el) !== o) updates.push([el, o]);
-      } else if (dimmed.has(el)) updates.push([el, null]);
-    });
-    updates.forEach(([el, o]) => {
+    for (let i = 0; i < updates.length; i += 2) {
+      const el = updates[i];
+      const o = updates[i + 1];
       if (o === null) {
         el.style.removeProperty("opacity");
         dimmed.delete(el);
@@ -497,7 +550,7 @@
         el.style.setProperty("opacity", o, "important");
         dimmed.set(el, o);
       }
-    });
+    }
 
     ticking = false;
   }
@@ -506,13 +559,24 @@
     () => {
       if (!ticking) {
         ticking = true;
-        requestAnimationFrame(onScrollFrame);
+        requestAnimationFrame(() => onScrollFrame(false));
       }
     },
     { passive: true }
   );
-  window.addEventListener("resize", onScrollFrame);
-  onScrollFrame();
+  window.addEventListener("resize", () => {
+    measureMetrics();
+    onScrollFrame(true);
+  });
+  window.addEventListener("load", () => {
+    measureMetrics();
+    onScrollFrame(true);
+  });
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(measureMetrics);
+  }
+  measureMetrics();
+  onScrollFrame(true);
 
   /* ---------------------------------------------------------
      5) COPY EMAIL & CONTACT FORM
