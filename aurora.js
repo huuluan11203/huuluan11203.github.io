@@ -24,13 +24,108 @@
     intensity: 1, // độ sáng tổng
     scrollDim: 0.8, // giảm sáng khi cuộn khỏi hero (0 = không giảm)
     resolution: 0.8, // tỉ lệ độ phân giải vẽ
-    lightInk: [0.09, 0.09, 0.11], // chế độ sáng: màu xám đen của cực quang
-    lightStrength: 0.62, // chế độ sáng: độ đậm của cực quang trên nền (0 → 1)
+    paletteInterval: 6, // mỗi bao nhiêu giây thì đổi sang bộ màu kế tiếp (0 = cố định bộ đầu)
+    paletteFade: 4, // thời gian chuyển màu mượt giữa hai bộ (giây)
+    lightStrength: 0.46, // chế độ sáng: hệ số đậm mặc định nếu bộ màu không chỉ định inkK
     themeEase: 0.08, // tốc độ chuyển sáng ↔ tối (lớn = nhanh)
     // --- hiệu năng ---
     adaptive: true, // máy yếu (rớt dưới ~50fps liên tục 2 giây) → tự giảm độ phân giải vẽ
     minResolution: 0.5, // độ phân giải thấp nhất khi tự giảm
   };
+
+  // Các bộ màu dịu mắt (mỗi bộ kèm màu mực đơn sắc hợp tông cho chế độ sáng)
+  const PALETTES = [
+    {
+      name: "Nordic Mist",
+      pink: [0.68, 0.86, 0.96],
+      violet: [0.45, 0.72, 0.92],
+      blue: [0.30, 0.56, 0.82],
+      teal: [0.38, 0.84, 0.76],
+      deep: [0.22, 0.36, 0.62],
+      ink: [0.16, 0.24, 0.36],
+      inkK: 0.48,
+    },
+    {
+      name: "Lavender Dusk",
+      pink: [0.84, 0.66, 0.94],
+      violet: [0.60, 0.54, 0.88],
+      blue: [0.42, 0.56, 0.86],
+      teal: [0.50, 0.78, 0.86],
+      deep: [0.32, 0.30, 0.64],
+      ink: [0.24, 0.20, 0.38],
+      inkK: 0.46,
+    },
+    {
+      name: "Moonlit Sage",
+      pink: [0.76, 0.92, 0.84],
+      violet: [0.46, 0.78, 0.70],
+      blue: [0.28, 0.60, 0.66],
+      teal: [0.62, 0.88, 0.74],
+      deep: [0.18, 0.36, 0.44],
+      ink: [0.15, 0.28, 0.26],
+      inkK: 0.46,
+    },
+    {
+      name: "Champagne Rose",
+      pink: [0.95, 0.80, 0.74],
+      violet: [0.82, 0.58, 0.68],
+      blue: [0.56, 0.46, 0.68],
+      teal: [0.92, 0.76, 0.62],
+      deep: [0.36, 0.28, 0.48],
+      ink: [0.36, 0.23, 0.31],
+      inkK: 0.42,
+    },
+    {
+      name: "Silver Silk",
+      pink: [0.86, 0.90, 0.96],
+      violet: [0.64, 0.70, 0.80],
+      blue: [0.44, 0.52, 0.64],
+      teal: [0.72, 0.80, 0.90],
+      deep: [0.26, 0.31, 0.42],
+      ink: [0.20, 0.22, 0.27],
+      inkK: 0.44,
+    },
+    {
+      name: "Ocean Velvet",
+      pink: [0.58, 0.76, 0.95],
+      violet: [0.38, 0.54, 0.86],
+      blue: [0.26, 0.42, 0.74],
+      teal: [0.34, 0.76, 0.84],
+      deep: [0.22, 0.24, 0.56],
+      ink: [0.13, 0.21, 0.36],
+      inkK: 0.48,
+    },
+    {
+      name: "Morning Dew",
+      pink: [0.76, 0.68, 0.96],
+      violet: [0.56, 0.66, 0.94],
+      blue: [0.44, 0.72, 0.90],
+      teal: [0.46, 0.84, 0.78],
+      deep: [0.48, 0.56, 0.82],
+      ink: [0.19, 0.25, 0.38],
+      inkK: 0.46,
+    },
+    {
+      name: "Soft Peach Sky",
+      pink: [0.96, 0.74, 0.72],
+      violet: [0.84, 0.62, 0.78],
+      blue: [0.60, 0.62, 0.88],
+      teal: [0.94, 0.80, 0.66],
+      deep: [0.52, 0.48, 0.76],
+      ink: [0.32, 0.22, 0.26],
+      inkK: 0.43,
+    },
+    {
+      name: "Botanical Watercolor",
+      pink: [0.68, 0.88, 0.82],
+      violet: [0.48, 0.78, 0.74],
+      blue: [0.42, 0.66, 0.78],
+      teal: [0.58, 0.84, 0.70],
+      deep: [0.36, 0.54, 0.66],
+      ink: [0.16, 0.27, 0.25],
+      inkK: 0.45,
+    },
+  ];
   // -------------------------------------------
 
   const gl = canvas.getContext("webgl", {
@@ -77,6 +172,11 @@
     uniform vec3 uPaper;     // màu nền chế độ sáng (= biến CSS --paper)
     uniform vec3 uInk;       // màu cực quang ở chế độ sáng
     uniform float uInkK;     // độ đậm cực quang ở chế độ sáng
+    uniform vec3 uPink;
+    uniform vec3 uViolet;
+    uniform vec3 uBlue;
+    uniform vec3 uTeal;
+    uniform vec3 uDeep;
 
     float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     float noise(vec2 p) {
@@ -94,21 +194,14 @@
     // smooth low-detail noise for the smoke field (big soft curls, no crinkles)
     float fbm2(vec2 p) { return 0.65 * noise(p) + 0.35 * noise(p * 2.03 + 3.1); }
 
-    // Stitch palette
-    const vec3 PINK   = vec3(0.86, 0.45, 1.00);
-    const vec3 VIOLET = vec3(0.60, 0.48, 1.00);
-    const vec3 BLUE   = vec3(0.42, 0.62, 1.00);
-    const vec3 TEAL   = vec3(0.32, 0.95, 0.88);
-    const vec3 DEEP   = vec3(0.50, 0.40, 0.95);
-
     // iridescent bands, indexed by depth inside the sheet (0 = top edge)
     vec3 palette(float h, float detail, float streak) {
-      vec3 c = mix(PINK, VIOLET, smoothstep(0.02, 0.12, h));
-      c = mix(c, BLUE, smoothstep(0.14, 0.34, h));
-      c = mix(c, TEAL, smoothstep(0.36, 0.55, h) * (1.0 - smoothstep(0.62, 0.85, h)) * detail * streak);
-      c = mix(c, DEEP, smoothstep(0.75, 1.0, h));
+      vec3 c = mix(uPink, uViolet, smoothstep(0.02, 0.12, h));
+      c = mix(c, uBlue, smoothstep(0.14, 0.34, h));
+      c = mix(c, uTeal, smoothstep(0.36, 0.55, h) * (1.0 - smoothstep(0.62, 0.85, h)) * detail * streak);
+      c = mix(c, uDeep, smoothstep(0.75, 1.0, h));
       // while a new aurora is still forming it is a plain violet band
-      return mix(mix(VIOLET, DEEP, h), c, detail);
+      return mix(mix(uViolet, uDeep, h), c, detail);
     }
 
     // One sheet of light. y: 0 = top, 1 = bottom.
@@ -158,7 +251,7 @@
 
       // thin bright pink-violet line right on the top edge
       float rim = exp(-abs(d - 0.004) / 0.024);
-      col = mix(col, PINK * 1.15, rim * 0.45 * rimK * det);
+      col = mix(col, uPink * 1.15, rim * 0.45 * rimK * det);
 
       return col * body;
     }
@@ -249,6 +342,7 @@
     "uThick", "uMorph", "uDetail", "uSeed", "uIntensity",
     "uSmoke", "uSmokeDensity", "uSmokeSpeed",
     "uLight", "uPaper", "uInk", "uInkK",
+    "uPink", "uViolet", "uBlue", "uTeal", "uDeep",
   ].forEach((n) => (U[n] = gl.getUniformLocation(prog, n)));
 
   let resolution = CFG.resolution; // có thể tự giảm trên máy yếu (xem loop)
@@ -306,9 +400,28 @@
     }
   });
 
+  function setMix3(loc, a, b, k) {
+    gl.uniform3f(loc, a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k);
+  }
+
   function render(now) {
-    const sec = ((now - start) / 1000) * CFG.speed;
+    const elapsed = Math.max(0, (now - start) / 1000);
+    const sec = elapsed * CFG.speed;
     const t = sec + 20.0;
+
+    // --- xoay vòng các bộ màu mỗi CFG.paletteInterval giây (chuyển mượt ở cuối chu kỳ)
+    let pA = PALETTES[0];
+    let pB = PALETTES[0];
+    let pK = 0;
+    if (!reduce && CFG.paletteInterval > 0 && PALETTES.length > 1) {
+      const step = CFG.paletteInterval;
+      const idx = Math.floor(elapsed / step) % PALETTES.length;
+      const ph = elapsed % step;
+      const fade = Math.min(CFG.paletteFade, step * 0.5);
+      pA = PALETTES[idx];
+      pB = PALETTES[(idx + 1) % PALETTES.length];
+      pK = fade > 0 ? smooth(step - fade, step, ph) : 0;
+    }
 
     // --- fade cycle: fade in → visible → fade out → dark → new shape
     let env = 1;
@@ -361,8 +474,15 @@
     gl.uniform1f(U.uSeed, seed);
     gl.uniform1f(U.uLight, light);
     gl.uniform3f(U.uPaper, paper[0], paper[1], paper[2]);
-    gl.uniform3f(U.uInk, CFG.lightInk[0], CFG.lightInk[1], CFG.lightInk[2]);
-    gl.uniform1f(U.uInkK, CFG.lightStrength);
+    setMix3(U.uPink, pA.pink, pB.pink, pK);
+    setMix3(U.uViolet, pA.violet, pB.violet, pK);
+    setMix3(U.uBlue, pA.blue, pB.blue, pK);
+    setMix3(U.uTeal, pA.teal, pB.teal, pK);
+    setMix3(U.uDeep, pA.deep, pB.deep, pK);
+    setMix3(U.uInk, pA.ink, pB.ink, pK);
+    const inkKA = pA.inkK ?? CFG.lightStrength;
+    const inkKB = pB.inkK ?? CFG.lightStrength;
+    gl.uniform1f(U.uInkK, inkKA + (inkKB - inkKA) * pK);
     gl.uniform1f(U.uIntensity, CFG.intensity * env * scrollK * (0.5 + 0.5 * detail));
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
