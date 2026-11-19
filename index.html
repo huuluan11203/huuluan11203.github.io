@@ -4,6 +4,16 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bùi Hữu Luân — Software Engineer | Portfolio</title>
+    <!-- Áp chế độ sáng/tối đã lưu TRƯỚC khi vẽ trang → không bị nháy tối rồi mới sáng -->
+    <script>
+      (function () {
+        var theme = "dark";
+        try {
+          if (localStorage.getItem("bhl_portfolio_theme") === "light") theme = "light";
+        } catch (e) {}
+        document.documentElement.setAttribute("data-theme", theme);
+      })();
+    </script>
     <meta
       name="description"
       content="Portfolio của Bùi Hữu Luân — Software Engineer định hướng Backend (Java / Spring Boot), sinh viên Công nghệ Thông tin, Đại học Sài Gòn."
@@ -16,15 +26,12 @@
       href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500&display=swap"
       rel="stylesheet"
     />
+    <!-- Font chữ ký cho tên ở hero. display=block: chờ font tải xong mới hiện,
+         tránh tên nhảy từ font khác sang (tên vốn đang fade-in nên không thấy trễ) -->
+    <link href="https://fonts.googleapis.com/css2?family=Momo+Signature&display=block" rel="stylesheet" />
 
-    <!-- Font Awesome 6.5.2 -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-      integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
+    <!-- Icon: Font Awesome Free 6.5.2 (CC BY 4.0, https://fontawesome.com/license/free), nhúng thẳng dạng SVG
+         thay vì tải cả bộ CSS + font icon (~377KB) chỉ để dùng 8 icon -->
 
     <link rel="stylesheet" href="styles.css" />
   </head>
@@ -44,8 +51,6 @@
         <nav class="nav-pill" aria-label="Primary Navigation">
           <a href="#home" class="nav-link active" data-section="home" data-i18n="nav.home">Trang chủ</a>
           <a href="#about" class="nav-link" data-section="about" data-i18n="nav.about">Giới thiệu</a>
-          <a href="#skills" class="nav-link" data-section="skills" data-i18n="nav.skills">Công nghệ</a>
-          <a href="#expertise" class="nav-link" data-section="expertise" data-i18n="nav.expertise">Năng lực</a>
           <a href="#contact" class="nav-link" data-section="contact" data-i18n="nav.contact">Liên hệ</a>
         </nav>
 
@@ -59,6 +64,17 @@
             <span class="lang-opt active" data-lang-ind="vi">VI</span>
             <span class="lang-sep" aria-hidden="true">/</span>
             <span class="lang-opt" data-lang-ind="en">EN</span>
+          </button>
+          <!-- Nút sáng/tối: dùng chung kiểu kính với nút ngôn ngữ (.lang-pill) -->
+          <button
+            type="button"
+            class="lang-pill theme-toggle"
+            id="themeToggleDesktop"
+            aria-pressed="false"
+            aria-label="Chuyển sang chế độ sáng"
+          >
+            <svg class="icon icon-sun theme-icon theme-icon-sun" viewBox="0 0 512 512" width="1em" height="1em" aria-hidden="true" focusable="false"><path d="M361.5 1.2c5 2.1 8.6 6.6 9.6 11.9L391 121l107.9 19.8c5.3 1 9.8 4.6 11.9 9.6s1.5 10.7-1.6 15.2L446.9 256l62.3 90.3c3.1 4.5 3.7 10.2 1.6 15.2s-6.6 8.6-11.9 9.6L391 391 371.1 498.9c-1 5.3-4.6 9.8-9.6 11.9s-10.7 1.5-15.2-1.6L256 446.9l-90.3 62.3c-4.5 3.1-10.2 3.7-15.2 1.6s-8.6-6.6-9.6-11.9L121 391 13.1 371.1c-5.3-1-9.8-4.6-11.9-9.6s-1.5-10.7 1.6-15.2L65.1 256 2.8 165.7c-3.1-4.5-3.7-10.2-1.6-15.2s6.6-8.6 11.9-9.6L121 121 140.9 13.1c1-5.3 4.6-9.8 9.6-11.9s10.7-1.5 15.2 1.6L256 65.1 346.3 2.8c4.5-3.1 10.2-3.7 15.2-1.6zM160 256a96 96 0 1 1 192 0 96 96 0 1 1 -192 0zm224 0a128 128 0 1 0 -256 0 128 128 0 1 0 256 0z"/></svg>
+            <svg class="icon icon-moon theme-icon theme-icon-moon" viewBox="0 0 384 512" width="0.75em" height="1em" aria-hidden="true" focusable="false"><path d="M223.5 32C100 32 0 132.3 0 256S100 480 223.5 480c60.6 0 115.5-24.2 155.8-63.4c5-4.9 6.3-12.5 3.1-18.7s-10.1-9.7-17-8.5c-9.8 1.7-19.8 2.6-30.1 2.6c-96.9 0-175.5-78.8-175.5-176c0-65.8 36-123.1 89.3-153.3c6.1-3.5 9.2-10.5 7.7-17.3s-7.3-11.9-14.3-12.5c-6.3-.5-12.6-.8-19-.8z"/></svg>
           </button>
         </div>
 
@@ -83,9 +99,7 @@
       <nav class="mobile-nav" aria-label="Mobile Navigation">
         <a href="#home" class="mobile-link active" style="--i: 0" data-section="home" data-i18n="nav.home">Trang chủ</a>
         <a href="#about" class="mobile-link" style="--i: 1" data-section="about" data-i18n="nav.about">Giới thiệu</a>
-        <a href="#skills" class="mobile-link" style="--i: 2" data-section="skills" data-i18n="nav.skills">Công nghệ</a>
-        <a href="#expertise" class="mobile-link" style="--i: 3" data-section="expertise" data-i18n="nav.expertise">Năng lực</a>
-        <a href="#contact" class="mobile-link" style="--i: 4" data-section="contact" data-i18n="nav.contact">Liên hệ</a>
+        <a href="#contact" class="mobile-link" style="--i: 2" data-section="contact" data-i18n="nav.contact">Liên hệ</a>
       </nav>
 
       <div class="mobile-sheet-actions">
@@ -95,8 +109,12 @@
           id="langToggleMobile"
           aria-label="Switch language between Vietnamese and English"
         >
-          <i class="fa-solid fa-globe" aria-hidden="true"></i>
+          <svg class="icon icon-globe" viewBox="0 0 512 512" width="1em" height="1em" aria-hidden="true" focusable="false"><path d="M352 256c0 22.2-1.2 43.6-3.3 64H163.3c-2.2-20.4-3.3-41.8-3.3-64s1.2-43.6 3.3-64H348.7c2.2 20.4 3.3 41.8 3.3 64zm28.8-64H503.9c5.3 20.5 8.1 41.9 8.1 64s-2.8 43.5-8.1 64H380.8c2.1-20.6 3.2-42 3.2-64s-1.1-43.4-3.2-64zm112.6-32H376.7c-10-63.9-29.8-117.4-55.3-151.6c78.3 20.7 142 77.5 171.9 151.6zm-149.1 0H167.7c6.1-36.4 15.5-68.6 27-94.7c10.5-23.6 22.2-40.7 33.5-51.5C239.4 3.2 248.7 0 256 0s16.6 3.2 27.8 13.8c11.3 10.8 23 27.9 33.5 51.5c11.6 26 20.9 58.2 27 94.7zm-209 0H18.6C48.6 85.9 112.2 29.1 190.6 8.4C165.1 42.6 145.3 96.1 135.3 160zM8.1 192H131.2c-2.1 20.6-3.2 42-3.2 64s1.1 43.4 3.2 64H8.1C2.8 299.5 0 278.1 0 256s2.8-43.5 8.1-64zM194.7 446.6c-11.6-26-20.9-58.2-27-94.6H344.3c-6.1 36.4-15.5 68.6-27 94.6c-10.5 23.6-22.2 40.7-33.5 51.5C272.6 508.8 263.3 512 256 512s-16.6-3.2-27.8-13.8c-11.3-10.8-23-27.9-33.5-51.5zM135.3 352c10 63.9 29.8 117.4 55.3 151.6C112.2 482.9 48.6 426.1 18.6 352H135.3zm358.1 0c-30 74.1-93.6 130.9-171.9 151.6c25.5-34.2 45.2-87.7 55.3-151.6H493.4z"/></svg>
           <span data-i18n="nav.switchLabel">Ngôn ngữ: Tiếng Việt → EN</span>
+        </button>
+        <button type="button" class="mobile-lang-btn" id="themeToggleMobile" aria-pressed="false">
+          <svg class="icon icon-circle-half-stroke" viewBox="0 0 512 512" width="1em" height="1em" aria-hidden="true" focusable="false"><path d="M448 256c0-106-86-192-192-192V448c106 0 192-86 192-192zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256z"/></svg>
+          <span data-theme-label>Giao diện: Tối → Sáng</span>
         </button>
         <a href="#contact" class="mobile-signin-btn" data-i18n="nav.cta">Liên hệ với tôi</a>
       </div>
@@ -122,10 +140,10 @@
           </p>
 
           <div class="hero-actions anim" style="--d: 0.6s">
-            <a href="#expertise" class="cta-btn" style="--d: 0.6s" data-i18n="hero.cta">Xem năng lực</a>
+            <a href="#about" class="cta-btn" style="--d: 0.6s" data-i18n="nav.about">Giới thiệu</a>
             <a href="#contact" class="dark-action-pill hero-secondary">
               <span data-i18n="hero.cta2">Liên hệ</span>
-              <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+              <svg class="icon icon-arrow-right" viewBox="0 0 448 512" width="0.875em" height="1em" aria-hidden="true" focusable="false"><path d="M438.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L338.8 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l306.7 0L233.4 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z"/></svg>
             </a>
           </div>
         </div>
@@ -163,14 +181,19 @@
 
           <div class="about-grid">
             <figure class="about-photo-wrap reveal-on-scroll">
-              <img
-                src="assets/bui-huu-luan.jpg"
-                alt="Bùi Hữu Luân"
-                class="about-photo"
-                loading="lazy"
-                width="640"
-                height="800"
-              />
+              <!-- WebP (87KB) cho trình duyệt hỗ trợ, JPEG (132KB) dự phòng -->
+              <picture>
+                <source srcset="assets/bui-huu-luan.webp" type="image/webp" />
+                <img
+                  src="assets/bui-huu-luan.jpg"
+                  alt="Bùi Hữu Luân"
+                  class="about-photo"
+                  loading="lazy"
+                  decoding="async"
+                  width="640"
+                  height="800"
+                />
+              </picture>
             </figure>
 
             <div class="about-body reveal-on-scroll">
@@ -205,237 +228,19 @@
                 </div>
               </dl>
 
-              <div class="about-links">
-                <a href="https://github.com/huuluan11203" target="_blank" rel="noopener noreferrer" class="dark-action-pill">
-                  <i class="fa-brands fa-github" aria-hidden="true"></i>
-                  <span>GitHub</span>
-                </a>
-                <a href="https://www.linkedin.com/in/huulu" target="_blank" rel="noopener noreferrer" class="dark-action-pill">
-                  <i class="fa-brands fa-linkedin-in" aria-hidden="true"></i>
-                  <span>LinkedIn</span>
-                </a>
-                <a href="#contact" class="light-action-pill" data-i18n="about.contactBtn">Liên hệ trực tiếp</a>
-              </div>
             </div>
           </div>
         </div>
       </section>
 
       <!-- =========================================================
-           02 — TECH STACK
-           ========================================================= -->
-      <section class="content-section" id="skills">
-        <div class="container">
-          <div class="section-header reveal-on-scroll">
-            <span class="section-kicker">02 — <span data-i18n="nav.skills">Công nghệ</span></span>
-            <h2 class="section-title" data-i18n="skills.title">Công cụ tôi dùng mỗi ngày.</h2>
-            <p class="section-subtitle" data-i18n="skills.subtitle">
-              Java là ngôn ngữ chính; các công nghệ còn lại giúp tôi đi trọn vòng đời một tính năng — từ thiết kế dữ liệu đến kiểm thử và đóng gói.
-            </p>
-          </div>
-
-          <div class="stack-grid reveal-group" data-stagger>
-            <div class="skill-block stack-card reveal-item">
-              <div class="skill-block-head">
-                <span class="stack-icon" aria-hidden="true"><i class="fa-solid fa-code"></i></span>
-                <h3 data-i18n="skills.g1">Ngôn ngữ</h3>
-              </div>
-              <ul class="skill-pills">
-                <li class="is-primary">Java</li>
-                <li>JavaScript</li>
-                <li>C#</li>
-                <li>Python</li>
-                <li>SQL</li>
-              </ul>
-            </div>
-
-            <div class="skill-block stack-card reveal-item">
-              <div class="skill-block-head">
-                <span class="stack-icon" aria-hidden="true"><i class="fa-solid fa-layer-group"></i></span>
-                <h3 data-i18n="skills.g2">Backend &amp; Framework</h3>
-              </div>
-              <ul class="skill-pills">
-                <li class="is-primary">Spring Boot</li>
-                <li>Spring Security</li>
-                <li>Hibernate / JPA</li>
-                <li>ASP.NET Core</li>
-                <li>Django</li>
-                <li>React</li>
-              </ul>
-            </div>
-
-            <div class="skill-block stack-card reveal-item">
-              <div class="skill-block-head">
-                <span class="stack-icon" aria-hidden="true"><i class="fa-solid fa-database"></i></span>
-                <h3 data-i18n="skills.g3">Cơ sở dữ liệu</h3>
-              </div>
-              <ul class="skill-pills">
-                <li class="is-primary">PostgreSQL</li>
-                <li>MySQL</li>
-                <li data-i18n="skills.dbModel">Mô hình hoá dữ liệu</li>
-                <li data-i18n="skills.dbTune">Tối ưu truy vấn</li>
-                <li>Transaction</li>
-              </ul>
-            </div>
-
-            <div class="skill-block stack-card reveal-item">
-              <div class="skill-block-head">
-                <span class="stack-icon" aria-hidden="true"><i class="fa-solid fa-screwdriver-wrench"></i></span>
-                <h3 data-i18n="skills.g4">Kiểm thử &amp; Công cụ</h3>
-              </div>
-              <ul class="skill-pills">
-                <li>JUnit</li>
-                <li>Mockito</li>
-                <li>AssertJ</li>
-                <li>Git</li>
-                <li>Docker</li>
-                <li>Postman</li>
-                <li>Swagger / OpenAPI</li>
-              </ul>
-            </div>
-
-            <div class="skill-block stack-card stack-card-wide reveal-item">
-              <div class="skill-block-head">
-                <span class="stack-icon" aria-hidden="true"><i class="fa-solid fa-seedling"></i></span>
-                <h3 data-i18n="skills.g5">Đang tìm hiểu &amp; đã làm quen</h3>
-              </div>
-              <ul class="skill-pills is-muted">
-                <li>NestJS</li>
-                <li>Microservices</li>
-                <li>Kafka / RabbitMQ</li>
-                <li>Redis</li>
-                <li>Kubernetes</li>
-                <li>CI/CD</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- =========================================================
-           03 — PROBLEM-SOLVING EXPERTISE
-           ========================================================= -->
-      <section class="content-section" id="expertise">
-        <div class="container">
-          <div class="section-header reveal-on-scroll">
-            <span class="section-kicker">03 — <span data-i18n="nav.expertise">Năng lực</span></span>
-            <h2 class="section-title" data-i18n="exp.title">Những bài toán tôi xử lý được.</h2>
-            <p class="section-subtitle" data-i18n="exp.subtitle">
-              Không chỉ viết cho chạy — tôi quan tâm hệ thống chạy đúng, nhanh và an toàn khi lượng dữ liệu và người dùng tăng lên.
-            </p>
-          </div>
-
-          <div class="expertise-grid reveal-group" data-stagger>
-            <article class="skill-block exp-card reveal-item">
-              <div class="exp-top">
-                <span class="exp-index">01</span>
-                <span class="stack-icon" aria-hidden="true"><i class="fa-solid fa-sitemap"></i></span>
-              </div>
-              <h3 data-i18n="exp.c1Title">Thiết kế hệ thống &amp; API</h3>
-              <p data-i18n="exp.c1Desc">
-                RESTful API theo kiến trúc phân tầng Controller – Service – Repository, tách bạch nghiệp vụ để dễ mở rộng và bảo trì; tài liệu hoá bằng Swagger / OpenAPI.
-              </p>
-            </article>
-
-            <article class="skill-block exp-card reveal-item">
-              <div class="exp-top">
-                <span class="exp-index">02</span>
-                <span class="stack-icon" aria-hidden="true"><i class="fa-solid fa-lock"></i></span>
-              </div>
-              <h3 data-i18n="exp.c2Title">Xử lý truy cập đồng thời</h3>
-              <p data-i18n="exp.c2Desc">
-                Ngăn race condition khi nhiều người dùng cùng thao tác trên một tài nguyên bằng Pessimistic Locking và quản lý transaction, giữ dữ liệu luôn chính xác.
-              </p>
-            </article>
-
-            <article class="skill-block exp-card reveal-item">
-              <div class="exp-top">
-                <span class="exp-index">03</span>
-                <span class="stack-icon" aria-hidden="true"><i class="fa-solid fa-gauge-high"></i></span>
-              </div>
-              <h3 data-i18n="exp.c3Title">Tối ưu truy vấn</h3>
-              <p data-i18n="exp.c3Desc">
-                Phát hiện và xử lý N+1 query bằng JOIN FETCH / EntityGraph, giảm số lần truy cập database không cần thiết và tăng tốc độ tải dữ liệu.
-              </p>
-            </article>
-
-            <article class="skill-block exp-card reveal-item">
-              <div class="exp-top">
-                <span class="exp-index">04</span>
-                <span class="stack-icon" aria-hidden="true"><i class="fa-solid fa-shield-halved"></i></span>
-              </div>
-              <h3 data-i18n="exp.c4Title">Xác thực &amp; phân quyền</h3>
-              <p data-i18n="exp.c4Desc">
-                Xác thực stateless với JWT và phân quyền theo vai trò bằng Spring Security.
-              </p>
-            </article>
-
-            <article class="skill-block exp-card reveal-item">
-              <div class="exp-top">
-                <span class="exp-index">05</span>
-                <span class="stack-icon" aria-hidden="true"><i class="fa-solid fa-vial-circle-check"></i></span>
-              </div>
-              <h3 data-i18n="exp.c5Title">Kiểm thử tự động</h3>
-              <p data-i18n="exp.c5Desc">
-                Viết unit test cho tầng controller và service với JUnit, Mockito, AssertJ để thay đổi và refactor code một cách an toàn.
-              </p>
-            </article>
-
-            <article class="skill-block exp-card reveal-item">
-              <div class="exp-top">
-                <span class="exp-index">06</span>
-                <span class="stack-icon" aria-hidden="true"><i class="fa-solid fa-diagram-project"></i></span>
-              </div>
-              <h3 data-i18n="exp.c6Title">Thuật toán &amp; tối ưu hoá</h3>
-              <p data-i18n="exp.c6Desc">
-                Giải thuật metaheuristic (Genetic Algorithm, ALNS), các toán tử local search và xử lý dữ liệu không gian cho bài toán tối ưu.
-              </p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <!-- =========================================================
-           04 — AI APPROACH
-           ========================================================= -->
-      <section class="content-section ai-section" id="ai">
-        <div class="container">
-
-          <div class="ai-grid reveal-group" data-stagger>
-            <div class="skill-block ai-card reveal-item">
-              <span class="ai-step">1</span>
-              <h3 data-i18n="ai.p1Title">Hiểu trước, sinh code sau</h3>
-              <p data-i18n="ai.p1Desc">Tôi tự phân tích bài toán và thiết kế giải pháp; AI chỉ giúp đẩy nhanh phần triển khai.</p>
-            </div>
-            <div class="skill-block ai-card reveal-item">
-              <span class="ai-step">2</span>
-              <h3 data-i18n="ai.p2Title">Kiểm chứng mọi đầu ra</h3>
-              <p data-i18n="ai.p2Desc">Code do AI gợi ý luôn được đọc hiểu, viết test và review như code của bất kỳ ai khác.</p>
-            </div>
-            <div class="skill-block ai-card reveal-item">
-              <span class="ai-step">3</span>
-              <h3 data-i18n="ai.p3Title">Làm chủ quyết định</h3>
-              <p data-i18n="ai.p3Desc">Kiến trúc, đánh đổi kỹ thuật và chất lượng sản phẩm là trách nhiệm của tôi — không phải của công cụ.</p>
-            </div>
-          </div>
-
-          <div class="research-note reveal-on-scroll">
-            <span class="research-label" data-i18n="ai.researchLabel">Nghiên cứu</span>
-            <p data-i18n="ai.research">
-              Bài báo “Đề xuất khung điều phối prompt động để giải đề thi Toán tốt nghiệp THPT Việt Nam bằng mô hình ngôn ngữ lớn” — đã nộp tới hội nghị AIIA 2026 (The second AI Bridge Conference).
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <!-- =========================================================
-           05 — CONTACT
+           02 — CONTACT
            ========================================================= -->
       <section class="content-section contact-section" id="contact">
         <div class="container">
           <div class="contact-grid">
             <div class="contact-info reveal-on-scroll">
-              <span class="section-kicker">04 — <span data-i18n="nav.contact">Liên hệ</span></span>
+              <span class="section-kicker">02 — <span data-i18n="nav.contact">Liên hệ</span></span>
               <h2 class="section-title" data-i18n="contact.title">Cùng trao đổi nhé.</h2>
               <p class="section-subtitle" data-i18n="contact.subtitle">
                 Tôi đang tìm vị trí Fresher Software Developer. Nếu bạn có cơ hội phù hợp hoặc muốn trao đổi, hãy để lại lời nhắn.
@@ -459,10 +264,10 @@
                   <span class="channel-label" data-i18n="contact.socialLabel">MẠNG XÃ HỘI</span>
                   <div class="channel-socials">
                     <a href="https://github.com/huuluan11203" target="_blank" rel="noopener noreferrer" class="channel-link">
-                      <i class="fa-brands fa-github" aria-hidden="true"></i> GitHub
+                      <svg class="icon icon-github" viewBox="0 0 496 512" width="0.9688em" height="1em" aria-hidden="true" focusable="false"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg> GitHub
                     </a>
                     <a href="https://www.linkedin.com/in/huulu" target="_blank" rel="noopener noreferrer" class="channel-link">
-                      <i class="fa-brands fa-linkedin" aria-hidden="true"></i> LinkedIn
+                      <svg class="icon icon-linkedin" viewBox="0 0 448 512" width="0.875em" height="1em" aria-hidden="true" focusable="false"><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"/></svg> LinkedIn
                     </a>
                   </div>
                 </div>
@@ -513,8 +318,95 @@
       </div>
     </footer>
 
+    <!-- Chữ kính cho tên ở hero. Độ trong suốt / độ sáng chỉnh bằng biến --name-* trong styles.css.
+         Thông số hình học tính theo px nên có 2 bản: màn lớn và màn nhỏ (≤ 720px). -->
+    <svg class="name-glass-defs" width="0" height="0" aria-hidden="true" focusable="false">
+      <filter id="name-glass" x="-8%" y="-30%" width="116%" height="160%" color-interpolation-filters="sRGB">
+        <!-- Bóng đổ mềm -->
+        <feGaussianBlur in="SourceAlpha" stdDeviation="8" />
+        <feOffset dy="6" result="shadowShape" />
+        <feFlood class="ng-shadow" />
+        <feComposite in2="shadowShape" operator="in" result="shadow" />
+
+        <!-- Thân chữ: lớp trắng mờ, độ đặc = --name-opacity -->
+        <feFlood class="ng-body" />
+        <feComposite in2="SourceAlpha" operator="in" result="body" />
+
+        <!-- Hình chữ làm mềm: dùng để tạo khối -->
+        <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="soft" />
+
+        <!-- Vệt sáng mép trên-trái: hình mềm dịch xuống-phải rồi trừ khỏi chữ -->
+        <feOffset in="soft" dx="2.6" dy="3.38" result="softDown" />
+        <feComposite in="SourceAlpha" in2="softDown" operator="arithmetic" k2="1" k3="-1" result="hiBand" />
+        <feFlood class="ng-shine" />
+        <feComposite in2="hiBand" operator="in" result="shine" />
+
+        <!-- Phản xạ yếu hơn ở mép dưới-phải -->
+        <feOffset in="soft" dx="-2.6" dy="-3.38" result="softUp" />
+        <feComposite in="SourceAlpha" in2="softUp" operator="arithmetic" k2="1" k3="-1" result="loBand" />
+        <feFlood class="ng-low" />
+        <feComposite in2="loBand" operator="in" result="low" />
+
+        <!-- Viền mảnh quanh chữ -->
+        <feMorphology in="SourceAlpha" operator="erode" radius="1" result="inner" />
+        <feComposite in="SourceAlpha" in2="inner" operator="out" result="rimShape" />
+        <feFlood class="ng-rim" />
+        <feComposite in2="rimShape" operator="in" result="rim" />
+
+        <feMerge>
+          <feMergeNode in="shadow" />
+          <feMergeNode in="body" />
+          <feMergeNode in="low" />
+          <feMergeNode in="shine" />
+          <feMergeNode in="rim" />
+        </feMerge>
+      </filter>
+
+      <filter id="name-glass-sm" x="-8%" y="-30%" width="116%" height="160%" color-interpolation-filters="sRGB">
+        <!-- Bóng đổ mềm -->
+        <feGaussianBlur in="SourceAlpha" stdDeviation="4" />
+        <feOffset dy="3" result="shadowShape" />
+        <feFlood class="ng-shadow" />
+        <feComposite in2="shadowShape" operator="in" result="shadow" />
+
+        <!-- Thân chữ: lớp trắng mờ, độ đặc = --name-opacity -->
+        <feFlood class="ng-body" />
+        <feComposite in2="SourceAlpha" operator="in" result="body" />
+
+        <!-- Hình chữ làm mềm: dùng để tạo khối -->
+        <feGaussianBlur in="SourceAlpha" stdDeviation="1.4" result="soft" />
+
+        <!-- Vệt sáng mép trên-trái: hình mềm dịch xuống-phải rồi trừ khỏi chữ -->
+        <feOffset in="soft" dx="1.2" dy="1.56" result="softDown" />
+        <feComposite in="SourceAlpha" in2="softDown" operator="arithmetic" k2="1" k3="-1" result="hiBand" />
+        <feFlood class="ng-shine" />
+        <feComposite in2="hiBand" operator="in" result="shine" />
+
+        <!-- Phản xạ yếu hơn ở mép dưới-phải -->
+        <feOffset in="soft" dx="-1.2" dy="-1.56" result="softUp" />
+        <feComposite in="SourceAlpha" in2="softUp" operator="arithmetic" k2="1" k3="-1" result="loBand" />
+        <feFlood class="ng-low" />
+        <feComposite in2="loBand" operator="in" result="low" />
+
+        <!-- Viền mảnh quanh chữ -->
+        <feMorphology in="SourceAlpha" operator="erode" radius="0.6" result="inner" />
+        <feComposite in="SourceAlpha" in2="inner" operator="out" result="rimShape" />
+        <feFlood class="ng-rim" />
+        <feComposite in2="rimShape" operator="in" result="rim" />
+
+        <feMerge>
+          <feMergeNode in="shadow" />
+          <feMergeNode in="body" />
+          <feMergeNode in="low" />
+          <feMergeNode in="shine" />
+          <feMergeNode in="rim" />
+        </feMerge>
+      </filter>
+    </svg>
+
     <script src="main.js"></script>
     <script src="dots.js"></script>
     <script src="aurora.js"></script>
+    <script src="liquid-glass.js"></script>
   </body>
 </html>

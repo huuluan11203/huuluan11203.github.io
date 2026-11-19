@@ -13,6 +13,10 @@
       "nav.contact": "Liên hệ",
       "nav.cta": "Liên hệ với tôi",
       "nav.switchLabel": "Ngôn ngữ: Tiếng Việt → EN",
+      "theme.toLight": "Chuyển sang chế độ sáng",
+      "theme.toDark": "Chuyển sang chế độ tối",
+      "theme.labelToLight": "Giao diện: Tối → Sáng",
+      "theme.labelToDark": "Giao diện: Sáng → Tối",
 
       "hero.subhead":
         "Tận dụng AI để làm nhanh hơn, nhưng mọi dòng code đều được tôi hiểu, kiểm chứng và chịu trách nhiệm.",
@@ -117,6 +121,10 @@
       "nav.contact": "Contact",
       "nav.cta": "Get in touch",
       "nav.switchLabel": "Language: English → VI",
+      "theme.toLight": "Switch to light mode",
+      "theme.toDark": "Switch to dark mode",
+      "theme.labelToLight": "Theme: Dark → Light",
+      "theme.labelToDark": "Theme: Light → Dark",
 
       "hero.subhead":
         "I leverage AI to move faster, but every line of code is understood, verified and owned by me.",
@@ -255,6 +263,8 @@
       formStatus.classList.remove("is-error");
     }
 
+    updateThemeLabels();
+
     try {
       window.localStorage.setItem("bhl_portfolio_lang", lang);
     } catch (_) {
@@ -270,6 +280,53 @@
   const langBtnMobile = document.getElementById("langToggleMobile");
   if (langBtnDesktop) langBtnDesktop.addEventListener("click", toggleLanguage);
   if (langBtnMobile) langBtnMobile.addEventListener("click", toggleLanguage);
+
+  /* ---------------------------------------------------------
+     1b) LIGHT / DARK THEME
+     Script trong <head> đã đặt data-theme trước khi vẽ trang.
+     Đổi chế độ → phát sự kiện "themechange" cho aurora.js và dots.js.
+     --------------------------------------------------------- */
+  const THEME_KEY = "bhl_portfolio_theme";
+  const root = document.documentElement;
+  const themeButtons = [document.getElementById("themeToggleDesktop"), document.getElementById("themeToggleMobile")].filter(Boolean);
+  const themeLabels = document.querySelectorAll("[data-theme-label]");
+  let currentTheme = root.getAttribute("data-theme") === "light" ? "light" : "dark";
+
+  function updateThemeLabels() {
+    const dict = I18N[currentLang] || I18N.vi;
+    const toLight = currentTheme === "dark";
+    themeButtons.forEach((btn) => {
+      btn.setAttribute("aria-pressed", String(!toLight));
+      btn.setAttribute("aria-label", dict[toLight ? "theme.toLight" : "theme.toDark"]);
+    });
+    themeLabels.forEach((label) => {
+      label.textContent = dict[toLight ? "theme.labelToLight" : "theme.labelToDark"];
+    });
+  }
+
+  function applyTheme(theme) {
+    currentTheme = theme;
+    root.setAttribute("data-theme", theme);
+    updateThemeLabels();
+    try {
+      window.localStorage.setItem(THEME_KEY, theme);
+    } catch (_) {
+      /* ignore storage restrictions */
+    }
+    window.dispatchEvent(new CustomEvent("themechange", { detail: { theme } }));
+  }
+
+  function toggleTheme() {
+    const next = currentTheme === "dark" ? "light" : "dark";
+    // Trình duyệt hỗ trợ View Transitions → chuyển mờ dần mượt; còn lại đổi ngay
+    if (document.startViewTransition && !prefersReducedMotion) {
+      document.startViewTransition(() => applyTheme(next));
+    } else {
+      applyTheme(next);
+    }
+  }
+
+  themeButtons.forEach((btn) => btn.addEventListener("click", toggleTheme));
 
   applyLanguage(currentLang);
 
@@ -380,16 +437,12 @@
     ".section-header > *",
     ".about-photo",
     ".about-body > *",
-    ".stack-card > *",
-    ".exp-card > *",
-    ".ai-card > *",
-    ".research-note > *",
     ".contact-info > *",
     ".contact-form > *",
   ].join(",");
   const fadeEls = Array.from(document.querySelectorAll(FADE_SELECTOR));
   const FADE_MIN = 0.15; // how dim text gets once it has passed under the nav
-  const dimmed = new Set();
+  const dimmed = new Map(); // phần tử đang mờ → độ mờ đã ghi
 
   function fadeLine() {
     // bottom edge of the nav (+ a little air) — text starts dimming when it reaches it
@@ -397,15 +450,31 @@
   }
 
   let ticking = false;
+  // Giá trị đã ghi lần trước: chỉ ghi lại khi đổi → không bắt trình duyệt tính lại style vô ích
+  let lastProgress = "";
+  let lastHeroP = "";
+  let lastScrolled = null;
   function onScrollFrame() {
     const y = window.scrollY;
     const vh = window.innerHeight;
     const max = document.documentElement.scrollHeight - vh;
 
-    if (progressBar) progressBar.style.transform = `scaleX(${max > 0 ? Math.min(1, y / max) : 0})`;
-    if (siteHeader) siteHeader.classList.toggle("is-scrolled", y > 24);
+    const progress = `scaleX(${max > 0 ? Math.min(1, y / max).toFixed(4) : 0})`;
+    if (progressBar && progress !== lastProgress) {
+      progressBar.style.transform = progress;
+      lastProgress = progress;
+    }
+    const scrolled = y > 24;
+    if (siteHeader && scrolled !== lastScrolled) {
+      siteHeader.classList.toggle("is-scrolled", scrolled);
+      lastScrolled = scrolled;
+    }
     if (heroSection && !prefersReducedMotion) {
-      heroSection.style.setProperty("--hero-p", Math.min(1, y / (vh * 0.9)).toFixed(4));
+      const heroP = Math.min(1, y / (vh * 0.9)).toFixed(4);
+      if (heroP !== lastHeroP) {
+        heroSection.style.setProperty("--hero-p", heroP);
+        lastHeroP = heroP;
+      }
     }
 
     // read all positions first, then write (avoids layout thrashing)
@@ -415,16 +484,18 @@
       const r = el.getBoundingClientRect();
       if (r.height === 0) return;
       const p = Math.min(1, Math.max(0, (z - r.top) / r.height)); // 0 = below the nav, 1 = fully passed
-      if (p > 0) updates.push([el, 1 - (1 - FADE_MIN) * p]);
-      else if (dimmed.has(el)) updates.push([el, null]);
+      if (p > 0) {
+        const o = (1 - (1 - FADE_MIN) * p).toFixed(3);
+        if (dimmed.get(el) !== o) updates.push([el, o]);
+      } else if (dimmed.has(el)) updates.push([el, null]);
     });
     updates.forEach(([el, o]) => {
       if (o === null) {
         el.style.removeProperty("opacity");
         dimmed.delete(el);
       } else {
-        el.style.setProperty("opacity", o.toFixed(3), "important");
-        dimmed.add(el);
+        el.style.setProperty("opacity", o, "important");
+        dimmed.set(el, o);
       }
     });
 

@@ -1,4 +1,5 @@
 :root {
+  --paper: #e7e7ea; /* nền chế độ sáng (aurora.js cũng đọc biến này) */
   --bg: #000000;
   --text: #ffffff;
   --muted: #8e8e8e;
@@ -22,6 +23,16 @@
 *::before,
 *::after {
   box-sizing: border-box;
+}
+
+/* Icon SVG nhúng (Font Awesome Free 6.5.2): cùng kích thước & canh dòng như bản webfont
+   (thông số lấy từ .svg-inline--fa của Font Awesome) */
+.icon {
+  display: inline-block;
+  height: 1em;
+  overflow: visible;
+  vertical-align: -0.125em;
+  fill: currentColor;
 }
 
 html {
@@ -606,6 +617,11 @@ body.menu-open {
   background: var(--surface);
 }
 
+/* <picture> (WebP + JPEG dự phòng) không tạo hộp riêng → layout như khi <img> là con trực tiếp */
+.about-photo-wrap picture {
+  display: contents;
+}
+
 .about-photo {
   display: block;
   width: 100%;
@@ -1018,38 +1034,30 @@ body.menu-open {
    LIQUID GLASS THEME (same recipe as folder 2 / liquid.md)
    Overrides the solid white / grey surfaces above.
    ========================================================= */
-
 :root {
-  /* ---- Độ đục của kính: chỉnh 4 biến này ---- */
-  --glass-bg: rgba(255, 255, 255, 0.06);   /* lớp trắng phủ: tăng = sáng/đục hơn */
-  --glass-tint: rgba(12, 12, 16, 0.42);    /* lớp tối bên dưới: tăng alpha = chữ dễ đọc hơn */
-  --glass-blur: 18px;                      /* độ nhòe phía sau kính */
-  --glass-saturate: 160%;                  /* độ rực màu phía sau kính */
+  /* ---- Độ đục của kính (giống bản mẫu Liquid Glass) ---- */
+  --glass-tint: rgba(12, 12, 16, 0.22);    /* lớp tối phủ trên kính */
+  --glass-bg: rgba(255, 255, 255, 0.04);   /* lớp trắng phủ trên kính */
+  --glass-blur: 10px;                      /* chỉ dùng ở chế độ dự phòng */
+  --glass-saturate: 170%;                  /* chỉ dùng ở chế độ dự phòng */
+  --lg-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
 
-  /* ---- Tán sắc (dispersion): chỉnh độ mạnh 0 → 1 ---- */
-  --disperse: 0.55;
+  /* ---- Tán sắc giả (chỉ ở chế độ dự phòng): 0 → 1 ---- */
+  --disperse: 0.25;
 
-  /* ---- Viền khung kính ---- */
-  --glass-edge-width: 1px;               /* độ dày viền: 0.8px mảnh hơn, 1.4px dày hơn */
+  /* ---- Viền khung kính (chỉ ở chế độ dự phòng) ---- */
+  --glass-edge-width: 1px;
 
   --glass-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.14),
-    inset 0 -1px 1px rgba(255, 255, 255, 0.04),
-    0 8px 32px rgba(0, 0, 0, 0.35);
-  /* Ánh màu tán sắc bên trong kính: đỏ-cam góc trên trái, xanh-tím góc dưới phải */
+    inset 0 1px 0.5px rgba(255, 255, 255, 0.22),
+    inset 0 -1px 0.5px rgba(255, 255, 255, 0.06),
+    0 6px 20px rgba(0, 0, 0, 0.18);
+  --glass-edge: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.14) 18%, rgba(255, 255, 255, 0) 38%,
+    rgba(255, 255, 255, 0) 62%, rgba(255, 255, 255, 0.1) 82%, rgba(255, 255, 255, 0.3) 100%);
   --glass-fringe:
-    radial-gradient(120% 90% at 0% 0%, rgba(255, 110, 90, calc(0.10 * var(--disperse))), transparent 55%),
-    radial-gradient(120% 90% at 100% 100%, rgba(90, 130, 255, calc(0.14 * var(--disperse))), transparent 55%),
-    radial-gradient(80% 60% at 100% 0%, rgba(120, 255, 200, calc(0.06 * var(--disperse))), transparent 60%);
-  --glass-edge: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.32) 0%,
-    rgba(255, 255, 255, 0.1) 20%,
-    rgba(255, 255, 255, 0) 40%,
-    rgba(255, 255, 255, 0) 60%,
-    rgba(255, 255, 255, 0.1) 80%,
-    rgba(255, 255, 255, 0.32) 100%
-  );
+    radial-gradient(140% 110% at 0% 0%, transparent 62%, rgba(255, 120, 90, calc(0.1 * var(--disperse))) 70%, transparent 76%),
+    radial-gradient(140% 110% at 100% 100%, transparent 62%, rgba(90, 140, 255, calc(0.12 * var(--disperse))) 70%, transparent 76%);
   --font-serif: "Be Vietnam Pro", "Segoe UI", system-ui, sans-serif;
 }
 
@@ -1083,17 +1091,23 @@ body {
   background:
     var(--glass-fringe),
     linear-gradient(var(--glass-bg), var(--glass-bg)),
-    var(--glass-tint);
+    linear-gradient(var(--glass-tint), var(--glass-tint)),
+    var(--lg-spec) 0 0 / 100% 100% no-repeat;
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: var(--lg-filter);
   border: none;
   box-shadow: var(--glass-shadow);
+  /* Ánh phản chiếu (specular) do liquid-glass.js đặt = url(map). Là lớp nền dưới cùng,
+     nằm ngay trên nền đã khúc xạ và dưới lớp tint — đúng thứ tự như khi còn nằm trong
+     SVG filter, nhưng rẻ hơn nhiều: feImage trong backdrop-filter bị vẽ lại mỗi khung hình. */
+  --lg-spec: none;
 }
 
 .mobile-sheet {
   position: fixed;
 }
 
+/* Viền gradient bằng mask: chỉ giữ dải viền dày --glass-edge-width (chế độ dự phòng) */
 .nav-pill::before,
 .lang-pill::before,
 .burger-btn::before,
@@ -1115,6 +1129,39 @@ body {
   mask-composite: exclude;
   pointer-events: none;
   z-index: 2;
+}
+
+/* ---- Chế độ khúc xạ (Chromium): liquid-glass.js gắn .is-refract và đặt
+   --lg-filter = url(#lg-N), --lg-spec = url(specular). Tán sắc đã nằm trong SVG filter
+   nên bỏ lớp tán sắc giả và viền gradient. ---- */
+.is-refract {
+  --glass-fringe: none;
+  -webkit-backdrop-filter: var(--lg-filter);
+  backdrop-filter: var(--lg-filter);
+}
+
+.is-refract::before {
+  display: none;
+}
+
+/* ---- Không có backdrop-filter nào (trình duyệt rất cũ) → nền đặc ---- */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :is(.nav-pill, .lang-pill, .burger-btn, .cta-btn, .mobile-sheet, .about-photo-wrap, .skill-block, .contact-form, .dark-action-pill) {
+    background: rgba(28, 28, 34, 0.88) !important;
+  }
+}
+
+/* ---- Người dùng bật "Giảm độ trong suốt" trong hệ điều hành ---- */
+@media (prefers-reduced-transparency: reduce) {
+  :is(.nav-pill, .lang-pill, .burger-btn, .cta-btn, .mobile-sheet, .about-photo-wrap, .skill-block, .contact-form, .dark-action-pill) {
+    background: rgba(28, 28, 34, 0.92) !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  :is(.nav-pill, .lang-pill, .burger-btn, .cta-btn, .mobile-sheet, .about-photo-wrap, .skill-block, .contact-form, .dark-action-pill)::before {
+    display: none;
+  }
 }
 
 /* Small frosted "glass pill" chips */
@@ -1319,7 +1366,8 @@ body {
   background:
     var(--glass-fringe),
     linear-gradient(var(--glass-bg), var(--glass-bg)),
-    var(--glass-tint);
+    linear-gradient(var(--glass-tint), var(--glass-tint)),
+    var(--lg-spec) 0 0 / 100% 100% no-repeat;
   color: #ffffff;
 }
 
@@ -1640,12 +1688,77 @@ html {
   margin-bottom: clamp(8px, 1.4vh, 16px);
 }
 
+/* =========================================================
+   TÊN Ở HERO — font chữ ký Momo Signature, chữ kính
+   Chỉnh các biến dưới đây (0 = tắt lớp đó)
+   ========================================================= */
+:root {
+  /* cỡ chữ: tên rộng ≈ 8 × cỡ chữ → 8.8vw ≈ 70% bề ngang màn hình */
+  --name-size: 8.8vw;
+  --name-opacity: 0.28;   /* độ đặc thân chữ: 0 = trong suốt hẳn, 1 = trắng đặc */
+  --name-shine: 0.95;     /* vệt sáng ở mép trên-trái */
+  --name-rim: 0.5;        /* viền sáng mảnh quanh chữ */
+  --name-shadow: 0.45;    /* bóng đổ phía dưới */
+
+  /* chế độ sáng: tên đổi sang màu tối */
+  --name-color-light: #1c1c22; /* màu thân chữ */
+  --name-opacity-light: 0.85;  /* độ đặc thân chữ: 0 = trong suốt hẳn, 1 = đặc */
+}
+
+.name-glass-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* Độ mờ từng lớp của filter #name-glass lấy từ các biến trên (chỉ một màu trắng) */
+.ng-body { flood-color: #ffffff; flood-opacity: var(--name-opacity); }
+.ng-shine { flood-color: #ffffff; flood-opacity: var(--name-shine); }
+.ng-low { flood-color: #ffffff; flood-opacity: calc(var(--name-shine) * 0.35); }
+.ng-rim { flood-color: #ffffff; flood-opacity: var(--name-rim); }
+.ng-shadow { flood-color: #05040c; flood-opacity: var(--name-shadow); }
+
+.headline:has(.line-1) {
+  font-size: var(--name-size);
+  letter-spacing: 0;
+  line-height: 1.25;
+}
+
 .headline-line.line-1 {
-  background: linear-gradient(180deg, #ffffff 35%, rgba(222, 216, 255, 0.86) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  padding-inline: 0.04em;
+  --name-filter: url(#name-glass);
+  font-family: "Momo Signature", var(--font-display), cursive;
+  font-weight: 400;
+  font-synthesis: none; /* font chỉ có 1 độ đậm: không cho trình duyệt tự làm đậm giả */
+  color: #ffffff; /* chỉ là khuôn hình chữ; màu thật do filter vẽ */
+  overflow: visible; /* nét bay của chữ ký không bị cắt */
+  padding: 0.08em 0.12em;
+  filter: var(--name-filter);
+  /* Tên được rộng hơn khung .hero (900px) mà vẫn căn giữa màn hình */
+  width: max-content;
+  position: relative;
+  left: 50%;
+  translate: -50% 0;
+}
+
+@media (max-width: 720px) {
+  .headline-line.line-1 {
+    --name-filter: url(#name-glass-sm);
+  }
+}
+
+/* Giảm chuyển động chỉ tắt hiệu ứng động, vẫn giữ chữ kính */
+@media (prefers-reduced-motion: reduce) {
+  .headline-line.line-1 {
+    filter: var(--name-filter) !important;
+  }
+}
+
+/* Giảm độ trong suốt → chữ trắng đặc, không hiệu ứng kính */
+@media (prefers-reduced-transparency: reduce) {
+  .headline-line.line-1 {
+    filter: none !important;
+  }
 }
 
 .hero-role {
@@ -1679,12 +1792,12 @@ html {
   font-size: clamp(13.5px, 1.5vw, 14.5px);
 }
 
-.hero-secondary i {
+.hero-secondary .icon {
   font-size: 12px;
   transition: transform 0.3s var(--ease-out);
 }
 
-.hero-secondary:hover i {
+.hero-secondary:hover .icon {
   transform: translateX(3px);
 }
 
@@ -1960,4 +2073,283 @@ html {
 
 .nav-link {
   padding-inline: clamp(8px, 1.1vw, 14px);
+}
+
+/* =========================================================
+   NÚT SÁNG / TỐI (cạnh nút ngôn ngữ, dùng chung kiểu kính .lang-pill)
+   ========================================================= */
+.theme-toggle {
+  width: clamp(44px, 5.2vw, 48px);
+  padding-inline: 0;
+  justify-content: center;
+  font-size: 15px;
+}
+
+/* Chế độ tối hiện mặt trời (bấm để sang sáng), chế độ sáng hiện mặt trăng */
+.theme-icon-moon,
+[data-theme="light"] .theme-icon-sun {
+  display: none;
+}
+
+[data-theme="light"] .theme-icon-moon {
+  display: inline-block;
+}
+
+/* Hiệu ứng chuyển chế độ (View Transitions): mờ dần thay vì đổi phụt */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.45s;
+  animation-timing-function: ease;
+}
+
+/* =========================================================
+   CHẾ ĐỘ SÁNG — nền xám trắng, chữ xám đen.
+   aurora.js (cực quang xám đen) và dots.js (chấm chỉ hiện khi bị hút)
+   tự đổi theo data-theme. Màu chữ chính: #1c1c22.
+   ========================================================= */
+[data-theme="light"] {
+  color-scheme: light;
+  --bg: var(--paper);
+  --text: #1c1c22;
+  --muted: #6b6b73;
+  --surface: #f1f1f3;
+  --surface-hover: #e9e9ec;
+  --pill-dark: #f1f1f3;
+  --trust-text: #4a4a52;
+  --border-subtle: rgba(22, 22, 28, 0.1);
+  --border-strong: rgba(22, 22, 28, 0.22);
+  --trust-border: rgba(22, 22, 28, 0.3);
+
+  /* kính: lớp trắng mờ thay cho lớp tối */
+  --glass-tint: rgba(255, 255, 255, 0.34);
+  --glass-bg: rgba(255, 255, 255, 0.2);
+  --glass-shadow:
+    inset 0 1px 0.5px rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0.5px rgba(255, 255, 255, 0.35),
+    0 6px 20px rgba(20, 20, 30, 0.08);
+  --header-bar-bg: rgba(236, 236, 240, 0.72);
+}
+
+[data-theme="light"] body {
+  background: var(--paper);
+}
+
+[data-theme="light"] ::selection {
+  background: #1c1c22;
+  color: #ffffff;
+}
+
+[data-theme="light"] :focus-visible {
+  outline-color: #1c1c22;
+}
+
+/* --- chữ đậm (thay cho #ffffff) --- */
+[data-theme="light"] .lang-pill,
+[data-theme="light"] .lang-opt.active,
+[data-theme="light"] .nav-link,
+[data-theme="light"] .mobile-sheet,
+[data-theme="light"] .mobile-link.active,
+[data-theme="light"] .mobile-lang-btn,
+[data-theme="light"] .cta-btn,
+[data-theme="light"] .dark-action-pill,
+[data-theme="light"] .about-lead,
+[data-theme="light"] .fact-row dd,
+[data-theme="light"] .hero-fact-title,
+[data-theme="light"] .skill-block-head h3,
+[data-theme="light"] .skill-pills li,
+[data-theme="light"] .skill-pills li.is-primary,
+[data-theme="light"] .exp-card h3,
+[data-theme="light"] .ai-card h3,
+[data-theme="light"] .channel-link,
+[data-theme="light"] .copy-btn,
+[data-theme="light"] .copy-btn:hover,
+[data-theme="light"] .form-field input,
+[data-theme="light"] .form-field textarea,
+[data-theme="light"] .footer-copy,
+[data-theme="light"] .back-top-link:hover,
+[data-theme="light"] .nav-pill:hover,
+[data-theme="light"] .lang-pill:hover,
+[data-theme="light"] .burger-btn:hover,
+[data-theme="light"] .cta-btn:hover,
+[data-theme="light"] .about-photo-wrap:hover,
+[data-theme="light"] .skill-block:hover,
+[data-theme="light"] .contact-form:hover,
+[data-theme="light"] .dark-action-pill:hover,
+[data-theme="light"] .burger-btn[aria-expanded="true"] {
+  color: #1c1c22;
+}
+
+/* --- chữ phụ (giữ thứ bậc như chế độ tối, đậm hơn chút cho dễ đọc trên nền sáng) --- */
+[data-theme="light"] .mobile-link {
+  color: rgba(28, 28, 34, 0.7);
+}
+
+[data-theme="light"] .hero-role,
+[data-theme="light"] .research-note p {
+  color: rgba(28, 28, 34, 0.75);
+}
+
+[data-theme="light"] .subhead {
+  color: rgba(28, 28, 34, 0.7);
+}
+
+[data-theme="light"] .stat-label,
+[data-theme="light"] .section-subtitle,
+[data-theme="light"] .skill-pills.is-muted li,
+[data-theme="light"] .exp-card p,
+[data-theme="light"] .ai-card p {
+  color: rgba(28, 28, 34, 0.68);
+}
+
+[data-theme="light"] .section-kicker,
+[data-theme="light"] .hero-facts .stat-label {
+  color: rgba(28, 28, 34, 0.6);
+}
+
+[data-theme="light"] .exp-index {
+  color: rgba(28, 28, 34, 0.42);
+}
+
+[data-theme="light"] .about-text,
+[data-theme="light"] .channel-static,
+[data-theme="light"] .form-field label,
+[data-theme="light"] .form-status {
+  color: rgba(28, 28, 34, 0.78);
+}
+
+[data-theme="light"] .form-status.is-error {
+  color: #b42318;
+}
+
+[data-theme="light"] .form-field input::placeholder,
+[data-theme="light"] .form-field textarea::placeholder {
+  color: rgba(28, 28, 34, 0.42);
+}
+
+[data-theme="light"] .section-title {
+  background: linear-gradient(to bottom, #1c1c22, rgba(28, 28, 34, 0.92), rgba(28, 28, 34, 0.7));
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+[data-theme="light"] .stack-icon {
+  color: #5a4bd1;
+  background: rgba(255, 255, 255, 0.5);
+  border-color: rgba(22, 22, 28, 0.1);
+}
+
+[data-theme="light"] .research-label {
+  color: #0f7f73;
+}
+
+/* --- vạch / chấm trang trí trắng → xám đen --- */
+[data-theme="light"] .burger-bar,
+[data-theme="light"] .burger-btn[aria-expanded="true"] .burger-bar {
+  background: #1c1c22;
+}
+
+[data-theme="light"] .nav-link.active::after,
+[data-theme="light"] .mobile-link.active::after {
+  background: #1c1c22;
+  box-shadow: -5px 0 0 #1c1c22, 5px 0 0 #1c1c22;
+}
+
+/* --- viền mảnh & nền mờ trắng → viền xám, nền trắng mờ --- */
+[data-theme="light"] .content-section {
+  border-top-color: rgba(22, 22, 28, 0.08);
+}
+
+[data-theme="light"] .fact-row,
+[data-theme="light"] .about-facts {
+  border-color: rgba(22, 22, 28, 0.1);
+}
+
+[data-theme="light"] .hero-facts .stat-item {
+  border-top-color: rgba(22, 22, 28, 0.12);
+}
+
+[data-theme="light"] .skill-pills li,
+[data-theme="light"] .copy-btn,
+[data-theme="light"] .mobile-lang-btn {
+  background: rgba(255, 255, 255, 0.45);
+  border-color: rgba(22, 22, 28, 0.12);
+}
+
+[data-theme="light"] .skill-pills li.is-primary {
+  background: linear-gradient(90deg, rgba(161, 66, 244, 0.18), rgba(66, 133, 244, 0.18));
+}
+
+[data-theme="light"] .copy-btn:hover {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+[data-theme="light"] .research-note {
+  background: rgba(255, 255, 255, 0.4);
+  border-color: rgba(22, 22, 28, 0.1);
+}
+
+[data-theme="light"] .form-field input,
+[data-theme="light"] .form-field textarea {
+  background: rgba(255, 255, 255, 0.45);
+  border-color: rgba(22, 22, 28, 0.16);
+}
+
+[data-theme="light"] .form-field input:focus,
+[data-theme="light"] .form-field textarea:focus {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(22, 22, 28, 0.4);
+}
+
+[data-theme="light"] .site-header::before {
+  border-bottom-color: rgba(22, 22, 28, 0.08);
+  box-shadow: 0 10px 30px rgba(20, 20, 30, 0.06);
+}
+
+/* --- nút nền đặc: trắng/chữ đen → xám đen/chữ trắng --- */
+[data-theme="light"] .mobile-signin-btn,
+[data-theme="light"] .submit-pill,
+[data-theme="light"] .light-action-pill {
+  background: #1c1c22;
+  color: #f4f4f6;
+}
+
+/* --- menu điện thoại: kính sáng --- */
+[data-theme="light"] .mobile-sheet {
+  --glass-tint: rgba(246, 246, 249, 0.78);
+  box-shadow: var(--glass-shadow), 0 20px 60px rgba(20, 20, 30, 0.16);
+}
+
+[data-theme="light"] .mobile-overlay {
+  background: rgba(30, 30, 36, 0.25);
+}
+
+/* --- trình duyệt không có WebGL: cực quang tĩnh màu xám --- */
+[data-theme="light"] .aurora-bg.aurora-fallback {
+  background:
+    radial-gradient(60% 40% at 15% 25%, rgba(30, 30, 38, 0.28), transparent 70%),
+    radial-gradient(60% 40% at 85% 25%, rgba(30, 30, 38, 0.24), transparent 70%),
+    radial-gradient(70% 35% at 50% 72%, rgba(30, 30, 38, 0.22), transparent 70%),
+    var(--paper);
+}
+
+/* --- tên ở hero: kính màu tối trên nền sáng (chỉnh bằng --name-color-light / --name-opacity-light) --- */
+[data-theme="light"] .ng-body { flood-color: var(--name-color-light); flood-opacity: var(--name-opacity-light); }
+[data-theme="light"] .ng-rim { flood-color: var(--name-color-light); }
+[data-theme="light"] .ng-shadow { flood-opacity: calc(var(--name-shadow) * 0.35); }
+
+/* --- nền đặc khi không có backdrop-filter / giảm độ trong suốt --- */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  [data-theme="light"] :is(.nav-pill, .lang-pill, .burger-btn, .cta-btn, .mobile-sheet, .about-photo-wrap, .skill-block, .contact-form, .dark-action-pill) {
+    background: rgba(242, 242, 245, 0.92) !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  [data-theme="light"] :is(.nav-pill, .lang-pill, .burger-btn, .cta-btn, .mobile-sheet, .about-photo-wrap, .skill-block, .contact-form, .dark-action-pill) {
+    background: rgba(242, 242, 245, 0.95) !important;
+  }
+
+  [data-theme="light"] .headline-line.line-1 {
+    color: #1c1c22;
+  }
 }

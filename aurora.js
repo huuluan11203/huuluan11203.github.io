@@ -1,21 +1,3 @@
-/* =========================================================
-   Aurora — tấm sáng óng ánh kiểu Stitch (WebGL shader)
-   Hình ảnh: tấm sáng mịn, mép trên hồng-tím → tím → xanh dương →
-   xanh ngọc → tím đậm; nếp gấp tối; lớp mờ phía sau tạo chiều sâu.
-
-   Chuyển động như KHÓI: toàn bộ tấm sáng bị cuốn theo một trường xoáy
-   (domain warping 2 tầng) trôi chậm lên trên & sang phải → cuộn, phình,
-   mép tan thành sợi, mật độ chỗ đặc chỗ loãng.
-   Khung hình dạng lớn (dựng theo video quay màn hình Stitch):
-   - "Khung" hình dạng do JS điều khiển ngẫu nhiên mượt: độ sâu chỗ
-     trũng (gần phẳng ↔ chữ V sâu), vị trí chỗ trũng (trái/giữa/phải),
-     độ nghiêng (chéo trái/phải), độ cao → lần lượt thành V, U, đường
-     chéo, dải nằm thấp… như video
-   - Chi tiết nhỏ (gợn, nếp gấp) trôi từ TRÁI sang PHẢI
-   - Chu kỳ tắt–sáng: tắt dần → tối ~1s → hiện lại với HÌNH DẠNG MỚI,
-     lúc đầu là dải tím đơn giản rồi mới thêm nếp gấp & màu
-   Vẽ ở nửa độ phân giải (ánh sáng vốn mềm) → nhẹ.
-   ========================================================= */
 (function () {
   const canvas = document.getElementById("auroraBg");
   if (!canvas) return;
@@ -42,10 +24,22 @@
     intensity: 1, // độ sáng tổng
     scrollDim: 0.8, // giảm sáng khi cuộn khỏi hero (0 = không giảm)
     resolution: 0.8, // tỉ lệ độ phân giải vẽ
+    lightInk: [0.09, 0.09, 0.11], // chế độ sáng: màu xám đen của cực quang
+    lightStrength: 0.62, // chế độ sáng: độ đậm của cực quang trên nền (0 → 1)
+    themeEase: 0.08, // tốc độ chuyển sáng ↔ tối (lớn = nhanh)
+    // --- hiệu năng ---
+    adaptive: true, // máy yếu (rớt dưới ~50fps liên tục 2 giây) → tự giảm độ phân giải vẽ
+    minResolution: 0.5, // độ phân giải thấp nhất khi tự giảm
   };
   // -------------------------------------------
 
-  const gl = canvas.getContext("webgl", { antialias: false, alpha: false, premultipliedAlpha: false });
+  const gl = canvas.getContext("webgl", {
+    antialias: false,
+    alpha: false,
+    premultipliedAlpha: false,
+    depth: false, // shader 2D không cần bộ đệm độ sâu / stencil → đỡ bộ nhớ GPU
+    stencil: false,
+  });
   if (!gl) {
     canvas.classList.add("aurora-fallback");
     return;
@@ -79,6 +73,10 @@
     uniform float uSmoke;
     uniform float uSmokeDensity;
     uniform float uSmokeSpeed;
+    uniform float uLight;    // 0 = chế độ tối (cực quang màu), 1 = chế độ sáng
+    uniform vec3 uPaper;     // màu nền chế độ sáng (= biến CSS --paper)
+    uniform vec3 uInk;       // màu cực quang ở chế độ sáng
+    uniform float uInkK;     // độ đậm cực quang ở chế độ sáng
 
     float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
     float noise(vec2 p) {
@@ -204,7 +202,11 @@
       float mx = max(c.r, max(c.g, c.b));
       c *= (1.0 - exp(-mx * 2.4)) / max(mx, 0.0001);
       c *= 1.0 - smoothstep(0.9, 1.0, y);                    // fade at the very bottom
-      gl_FragColor = vec4(c, 1.0);
+
+      // chế độ sáng: nền xám trắng, chỗ cực quang càng sáng thì mực xám đen càng đậm
+      float lum = clamp(max(c.r, max(c.g, c.b)), 0.0, 1.0);
+      vec3 inked = mix(uPaper, uInk, lum * uInkK);
+      gl_FragColor = vec4(mix(c, inked, uLight), 1.0);
     }
   `;
 
@@ -246,10 +248,12 @@
     "uRes", "uTime", "uTop", "uDepth", "uDip", "uTilt", "uRound", "uRipple", "uFlow",
     "uThick", "uMorph", "uDetail", "uSeed", "uIntensity",
     "uSmoke", "uSmokeDensity", "uSmokeSpeed",
+    "uLight", "uPaper", "uInk", "uInkK",
   ].forEach((n) => (U[n] = gl.getUniformLocation(prog, n)));
 
+  let resolution = CFG.resolution; // có thể tự giảm trên máy yếu (xem loop)
   function resize() {
-    const s = CFG.resolution;
+    const s = resolution;
     canvas.width = Math.max(1, Math.round(window.innerWidth * s));
     canvas.height = Math.max(1, Math.round(window.innerHeight * s));
     gl.viewport(0, 0, canvas.width, canvas.height);
@@ -282,6 +286,25 @@
   const start = performance.now();
   const baseSeed = Math.random() * 100;
   let scrollK = 1;
+
+  /* ---------- chế độ sáng / tối (main.js phát sự kiện "themechange") ---------- */
+  const isLight = () => document.documentElement.getAttribute("data-theme") === "light";
+  let lightTarget = isLight() ? 1 : 0;
+  let light = lightTarget;
+  function readPaper() {
+    const hex = getComputedStyle(document.documentElement).getPropertyValue("--paper").trim().replace("#", "");
+    const full = hex.length === 3 ? hex.split("").map((c) => c + c).join("") : hex;
+    const n = parseInt(full, 16);
+    return Number.isNaN(n) || full.length !== 6 ? [0.906, 0.906, 0.918] : [(n >> 16) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+  }
+  const paper = readPaper();
+  window.addEventListener("themechange", () => {
+    lightTarget = isLight() ? 1 : 0;
+    if (reduce) {
+      light = lightTarget;
+      render(start + 5000);
+    }
+  });
 
   function render(now) {
     const sec = ((now - start) / 1000) * CFG.speed;
@@ -317,6 +340,8 @@
     // --- dim while scrolled past the hero
     const scrolled = Math.min(1, window.scrollY / window.innerHeight);
     scrollK += (1 - CFG.scrollDim * scrolled - scrollK) * 0.08;
+    light += (lightTarget - light) * CFG.themeEase;
+    if (Math.abs(lightTarget - light) < 0.001) light = lightTarget;
 
     gl.uniform2f(U.uRes, canvas.width, canvas.height);
     gl.uniform1f(U.uTime, t);
@@ -334,12 +359,45 @@
     gl.uniform1f(U.uSmokeSpeed, CFG.smokeSpeed);
     gl.uniform1f(U.uDetail, detail);
     gl.uniform1f(U.uSeed, seed);
+    gl.uniform1f(U.uLight, light);
+    gl.uniform3f(U.uPaper, paper[0], paper[1], paper[2]);
+    gl.uniform3f(U.uInk, CFG.lightInk[0], CFG.lightInk[1], CFG.lightInk[2]);
+    gl.uniform1f(U.uInkK, CFG.lightStrength);
     gl.uniform1f(U.uIntensity, CFG.intensity * env * scrollK * (0.5 + 0.5 * detail));
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
 
+  /* ---------- tự giảm độ phân giải trên máy yếu ----------
+     Máy không kham nổi (rớt dưới ~50fps liên tục 2 giây) → giảm độ phân giải vẽ từng bước 20%,
+     thấp nhất CFG.minResolution. Máy đủ mạnh giữ nguyên CFG.resolution.
+     (Đã thử giới hạn 60 lần vẽ/giây trên màn 120Hz: đo được làm Chrome tính style gấp 3 lần
+     lúc cuộn trang → bỏ.) */
+  let frameMs = 16.7; // khoảng cách trung bình giữa các khung hình (ms)
+  let minFrameMs = Infinity; // ≈ chu kỳ quét của màn hình
+  let lastNow = 0;
+  let slowSince = 0;
+
   function loop(now) {
+    const dt = now - lastNow;
+    lastNow = now;
+    if (dt > 3 && dt < 100) {
+      frameMs += (dt - frameMs) * 0.05;
+      minFrameMs = Math.min(minFrameMs, dt);
+    }
+
     render(now);
+
+    if (CFG.adaptive && resolution > CFG.minResolution && document.visibilityState === "visible") {
+      const slow = frameMs > Math.max(minFrameMs * 1.6, 20);
+      if (!slow) slowSince = 0;
+      else if (!slowSince) slowSince = now;
+      else if (now - slowSince > 2000) {
+        resolution = Math.max(CFG.minResolution, resolution * 0.8);
+        resize();
+        slowSince = now;
+      }
+    }
+
     requestAnimationFrame(loop);
   }
 
