@@ -2085,6 +2085,11 @@ html {
   font-size: 15px;
 }
 
+/* Mặt trời to gấp đôi (khung 1em × 1em tính theo cỡ chữ này) */
+.theme-icon-sun {
+  font-size: 1.25em;
+}
+
 /* Chế độ tối hiện mặt trời (bấm để sang sáng), chế độ sáng hiện mặt trăng */
 .theme-icon-moon,
 [data-theme="light"] .theme-icon-sun {
@@ -2093,6 +2098,7 @@ html {
 
 [data-theme="light"] .theme-icon-moon {
   display: inline-block;
+  font-size: 1em;
 }
 
 /* Hiệu ứng chuyển chế độ (View Transitions): mờ dần thay vì đổi phụt */
