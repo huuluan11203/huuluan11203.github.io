@@ -26,7 +26,7 @@
       "facts.f3Title": "Thiết kế hệ thống",
       "facts.f3": "API phân tầng · đồng thời",
       "facts.f4Title": "Đại học Sài Gòn",
-      "facts.f4": "CNTT · 2022 – nay",
+      "facts.f4": "CNTT · 2022 – 2027",
 
       "about.lead":
         "Sinh viên năm cuối ngành Công nghệ Thông tin tại Đại học Sài Gòn, định hướng Full Stack / Software Engineer.",
@@ -35,7 +35,7 @@
       "about.p2":
         "Bên cạnh Java, tôi làm việc với JavaScript, C# (ASP.NET Core) và Python. Tôi đang tìm vị trí Fresher Software Developer để đóng góp vào sản phẩm thực tế, làm việc trong môi trường Agile/Scrum và phát triển lên Software Engineer.",
       "about.f1Label": "Học vấn",
-      "about.f1Val": "Đại học Sài Gòn — CNTT (2022 – nay)",
+      "about.f1Val": "Đại học Sài Gòn — CNTT (2022 – 2027)",
       "about.f2Label": "Định hướng",
       "about.f2Val": "Full Stack · Software Engineer",
       "about.f3Label": "Công nghệ chính",
@@ -102,9 +102,9 @@
       "contact.locVal": "TP. Hồ Chí Minh, Việt Nam",
       "contact.formKicker": "GỬI LỜI NHẮN",
       "contact.nameLabel": "Họ và tên của bạn",
-      "contact.namePh": "Nguyễn Văn A",
+      "contact.namePh": "Huu Lu",
       "contact.emailLabel": "Địa chỉ Email",
-      "contact.emailPh": "ban@congty.com",
+      "contact.emailPh": "HuuLu@congty.com",
       "contact.msgLabel": "Nội dung",
       "contact.msgPh": "Vị trí, cơ hội hoặc điều bạn muốn trao đổi...",
       "contact.sendBtn": "Gửi lời nhắn",
@@ -137,7 +137,7 @@
       "facts.f3Title": "System design",
       "facts.f3": "Layered APIs · concurrency",
       "facts.f4Title": "Saigon University",
-      "facts.f4": "IT · 2022 – present",
+      "facts.f4": "IT · 2022 – 2027",
 
       "about.lead":
         "Final-year Information Technology student at Saigon University, focused on Full Stack / Software Engineering.",
@@ -146,7 +146,7 @@
       "about.p2":
         "Beyond Java, I work with JavaScript, C# (ASP.NET Core) and Python. I'm looking for a Fresher Software Developer role to contribute to real products, work in an Agile/Scrum team, and grow into a full-time Software Engineer.",
       "about.f1Label": "Education",
-      "about.f1Val": "Saigon University — IT (2022 – present)",
+      "about.f1Val": "Saigon University — IT (2022 – 2027)",
       "about.f2Label": "Focus",
       "about.f2Val": "Full Stack · Software Engineer",
       "about.f3Label": "Core stack",
@@ -212,9 +212,9 @@
       "contact.locVal": "Ho Chi Minh City, Vietnam",
       "contact.formKicker": "SEND MESSAGE",
       "contact.nameLabel": "Your name",
-      "contact.namePh": "Alex Nguyen",
+      "contact.namePh": "Huu Lu",
       "contact.emailLabel": "Email address",
-      "contact.emailPh": "you@company.com",
+      "contact.emailPh": "HuuLu@congty.com",
       "contact.msgLabel": "Message",
       "contact.msgPh": "The role, opportunity or topic you'd like to discuss...",
       "contact.sendBtn": "Send message",
@@ -448,7 +448,7 @@
     ".profile-intro > *",
     ".profile-subgrid",
     ".contact-channels > *",
-    ".contact-form > *",
+    ".contact-form > :not(.contact-form-glass)",
   ].join(",");
   const fadeEls = Array.from(document.querySelectorAll(FADE_SELECTOR));
   const FADE_MIN = 0.15; // how dim text gets once it has passed under the nav

@@ -233,6 +233,7 @@ body.menu-open {
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
+  gap: clamp(12px, 2vh, 24px);
   padding: clamp(16px, 2.4vh, 28px) clamp(14px, 3vw, 32px);
   height: 100vh;
   height: 100dvh;
@@ -872,14 +873,17 @@ body.menu-open {
 
 .submit-pill {
   align-self: flex-start;
-  height: 46px;
-  padding-inline: 28px;
-  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: clamp(44px, 5.2vw, 48px);
+  padding-inline: clamp(22px, 3vw, 28px);
+  border-radius: 999px;
   border: none;
   color: #ffffff;
   font-family: var(--font-sans);
-  font-size: 14px;
-  font-weight: 600;
+  font-size: clamp(13.5px, 1.5vw, 14.5px);
+  font-weight: 500;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -974,6 +978,7 @@ body.menu-open {
 
 @media (max-height: 700px) {
   .page {
+    height: auto;
     min-height: 100dvh;
     padding-block: 12px;
   }
@@ -1070,7 +1075,7 @@ body.menu-open {
 .about-photo-wrap,
 .skill-block,
 .bento-card,
-.contact-form,
+.contact-form-glass,
 .submit-pill,
 .copy-btn,
 .dark-action-pill {
@@ -1096,6 +1101,28 @@ body.menu-open {
   position: fixed;
 }
 
+/* Tách lớp kính nền của form ra phần tử anh em để <form> không tạo Backdrop Root,
+   giúp nút .submit-pill bên trong khúc xạ kính lỏng thật giống các nút khác trên Chromium. */
+.contact-form {
+  position: relative;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.contact-form-glass {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.contact-form > :not(.contact-form-glass) {
+  position: relative;
+  z-index: 1;
+}
+
 /* Viền gradient bằng mask: chỉ giữ dải viền dày --glass-edge-width (chế độ dự phòng) */
 .nav-pill::before,
 .lang-pill::before,
@@ -1107,7 +1134,7 @@ body.menu-open {
 .about-photo-wrap::before,
 .skill-block::before,
 .bento-card::before,
-.contact-form::before,
+.contact-form-glass::before,
 .submit-pill::before,
 .copy-btn::before,
 .dark-action-pill::before {
@@ -1140,20 +1167,20 @@ body.menu-open {
 
 /* ---- Không có backdrop-filter nào (trình duyệt rất cũ) → nền đặc ---- */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  :is(.nav-pill, .lang-pill, .burger-btn, .cta-btn, .mobile-sheet, .mobile-lang-btn, .mobile-signin-btn, .about-photo-wrap, .skill-block, .bento-card, .contact-form, .submit-pill, .copy-btn, .dark-action-pill) {
+  :is(.nav-pill, .lang-pill, .burger-btn, .cta-btn, .mobile-sheet, .mobile-lang-btn, .mobile-signin-btn, .about-photo-wrap, .skill-block, .bento-card, .contact-form-glass, .submit-pill, .copy-btn, .dark-action-pill) {
     background: rgba(28, 28, 34, 0.88) !important;
   }
 }
 
 /* ---- Người dùng bật "Giảm độ trong suốt" trong hệ điều hành ---- */
 @media (prefers-reduced-transparency: reduce) {
-  :is(.nav-pill, .lang-pill, .burger-btn, .cta-btn, .mobile-sheet, .mobile-lang-btn, .mobile-signin-btn, .about-photo-wrap, .skill-block, .bento-card, .contact-form, .submit-pill, .copy-btn, .dark-action-pill) {
+  :is(.nav-pill, .lang-pill, .burger-btn, .cta-btn, .mobile-sheet, .mobile-lang-btn, .mobile-signin-btn, .about-photo-wrap, .skill-block, .bento-card, .contact-form-glass, .submit-pill, .copy-btn, .dark-action-pill) {
     background: rgba(28, 28, 34, 0.92) !important;
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
   }
 
-  :is(.nav-pill, .lang-pill, .burger-btn, .cta-btn, .mobile-sheet, .mobile-lang-btn, .mobile-signin-btn, .about-photo-wrap, .skill-block, .bento-card, .contact-form, .submit-pill, .copy-btn, .dark-action-pill)::before {
+  :is(.nav-pill, .lang-pill, .burger-btn, .cta-btn, .mobile-sheet, .mobile-lang-btn, .mobile-signin-btn, .about-photo-wrap, .skill-block, .bento-card, .contact-form-glass, .submit-pill, .copy-btn, .dark-action-pill)::before {
     display: none;
   }
 }
@@ -1317,20 +1344,10 @@ body.menu-open {
 
 .dark-action-pill:hover,
 .copy-btn:hover,
+.submit-pill:hover,
 .mobile-lang-btn:hover {
   --glass-bg: rgba(255, 255, 255, 0.12);
   color: #ffffff;
-}
-
-/* Nút Gửi lời nhắn: kính lỏng màu xanh chàm dịu đồng bộ với khung & bo góc 16px */
-.submit-pill {
-  --glass-tint: rgba(108, 132, 245, 0.28);
-  --glass-bg: rgba(255, 255, 255, 0.08);
-  color: #ffffff;
-}
-
-.submit-pill:hover {
-  --glass-bg: rgba(255, 255, 255, 0.16);
 }
 
 /* --- Skills & Contact --- */
@@ -1372,7 +1389,6 @@ body.menu-open {
 .about-photo-wrap:hover,
 .skill-block:hover,
 .bento-card:hover,
-.contact-form:hover,
 .submit-pill:hover,
 .copy-btn:hover,
 .dark-action-pill:hover,
@@ -1777,6 +1793,9 @@ html {
   justify-content: center;
   align-items: center;
   gap: 14px;
+  /* Đẩy cụm nút xuống theo luồng layout (không dùng position: relative; top cố định
+     để không đè lên dải 4 ô bên dưới) và tự co mượt theo cả chiều rộng lẫn chiều cao */
+  margin-top: clamp(0px, min(7vw, 10vh - 28px), 70px);
 }
 
 .hero-secondary {
@@ -1876,12 +1895,6 @@ html {
 
 .stack-card .skill-block-head {
   margin-bottom: 18px;
-}
-
-.skill-pills li.is-primary {
-  color: #ffffff;
-  background: linear-gradient(90deg, rgba(161, 66, 244, 0.3), rgba(66, 133, 244, 0.3));
-  border-color: rgba(170, 150, 255, 0.45);
 }
 
 .skill-pills.is-muted li {
@@ -2156,7 +2169,6 @@ html {
 [data-theme="light"] .hero-fact-title,
 [data-theme="light"] .skill-block-head h3,
 [data-theme="light"] .skill-pills li,
-[data-theme="light"] .skill-pills li.is-primary,
 [data-theme="light"] .exp-card h3,
 [data-theme="light"] .ai-card h3,
 [data-theme="light"] .channel-link,
@@ -2173,7 +2185,6 @@ html {
 [data-theme="light"] .about-photo-wrap:hover,
 [data-theme="light"] .skill-block:hover,
 [data-theme="light"] .bento-card:hover,
-[data-theme="light"] .contact-form:hover,
 [data-theme="light"] .dark-action-pill:hover,
 [data-theme="light"] .burger-btn[aria-expanded="true"] {
   color: #1c1c22;
@@ -2282,10 +2293,6 @@ html {
   border-color: rgba(22, 22, 28, 0.16);
 }
 
-[data-theme="light"] .skill-pills li.is-primary {
-  background: linear-gradient(90deg, rgba(161, 66, 244, 0.18), rgba(66, 133, 244, 0.18));
-}
-
 [data-theme="light"] .research-note {
   background: rgba(20, 22, 30, 0.08);
   border-color: rgba(22, 22, 28, 0.14);
@@ -2303,8 +2310,7 @@ html {
   border-color: rgba(22, 22, 28, 0.36);
 }
 
-/* --- nút chính ở chế độ sáng: kính lỏng xanh chàm dịu đồng bộ với khung --- */
-[data-theme="light"] .submit-pill,
+/* --- nút chính ở menu di động chế độ sáng --- */
 [data-theme="light"] .mobile-signin-btn {
   --glass-tint: rgba(68, 86, 178, 0.24);
   --glass-bg: rgba(255, 255, 255, 0.14);
@@ -2342,13 +2348,13 @@ html {
 
 /* --- nền đặc khi không có backdrop-filter / giảm độ trong suốt --- */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  [data-theme="light"] :is(.nav-pill, .lang-pill, .burger-btn, .cta-btn, .mobile-sheet, .mobile-lang-btn, .mobile-signin-btn, .about-photo-wrap, .skill-block, .bento-card, .contact-form, .submit-pill, .copy-btn, .dark-action-pill) {
+  [data-theme="light"] :is(.nav-pill, .lang-pill, .burger-btn, .cta-btn, .mobile-sheet, .mobile-lang-btn, .mobile-signin-btn, .about-photo-wrap, .skill-block, .bento-card, .contact-form-glass, .submit-pill, .copy-btn, .dark-action-pill) {
     background: rgba(204, 206, 214, 0.92) !important;
   }
 }
 
 @media (prefers-reduced-transparency: reduce) {
-  [data-theme="light"] :is(.nav-pill, .lang-pill, .burger-btn, .cta-btn, .mobile-sheet, .mobile-lang-btn, .mobile-signin-btn, .about-photo-wrap, .skill-block, .bento-card, .contact-form, .submit-pill, .copy-btn, .dark-action-pill) {
+  [data-theme="light"] :is(.nav-pill, .lang-pill, .burger-btn, .cta-btn, .mobile-sheet, .mobile-lang-btn, .mobile-signin-btn, .about-photo-wrap, .skill-block, .bento-card, .contact-form-glass, .submit-pill, .copy-btn, .dark-action-pill) {
     background: rgba(204, 206, 214, 0.95) !important;
   }
 

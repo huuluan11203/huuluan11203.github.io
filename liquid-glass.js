@@ -29,7 +29,7 @@
     ".mobile-signin-btn",
     ".skill-block",
     ".bento-card",
-    ".contact-form",
+    ".contact-form-glass",
     ".submit-pill",
     ".copy-btn",
     ".dark-action-pill",
@@ -427,7 +427,7 @@
     const key = w + "x" + h + "r" + r;
     if (key === g.key) return;
     const token = ++g.token;
-    const nested = !!(g.node.parentElement && g.node.parentElement.closest(".contact-form, .mobile-sheet, .bento-card"));
+    const nested = !!(g.node.parentElement && g.node.parentElement.closest(".mobile-sheet, .bento-card"));
     const large = w * h > DISPERSION_MAX_AREA;
     requestMaps(w, h, r, nested || large, !nested).then((maps) => {
       if (token !== g.token || reducedTransparency.matches) return;
