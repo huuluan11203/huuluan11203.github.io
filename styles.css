@@ -1762,7 +1762,7 @@ html {
 }
 
 .hero-role {
-  margin: 0 0 clamp(14px, 2.2vh, 24px);
+  margin: 0 0 clamp(28px, 4.4vh, 42px);
   padding-left: 0.42em; /* balance the trailing letter-spacing so it looks centred */
   font-size: clamp(13px, 1.45vw, 17px);
   font-weight: 600;
@@ -1771,19 +1771,12 @@ html {
   color: rgba(255, 255, 255, 0.72);
 }
 
-.subhead {
-  max-width: min(560px, 92%);
-  font-size: clamp(15px, 1.35vw, 17px);
-  color: rgba(255, 255, 255, 0.66);
-  margin-bottom: clamp(20px, 3vh, 30px);
-}
-
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
 .hero-secondary {
@@ -2475,7 +2468,7 @@ html {
   margin-bottom: 2px;
 }
 
-/* --- Section Header Split --- */
+/* --- Section Header --- */
 .section-header-split {
   display: flex;
   align-items: flex-end;
@@ -2484,15 +2477,12 @@ html {
   flex-wrap: wrap;
 }
 
-.section-meta {
-  margin: 0 0 14px;
-  font-size: 12px;
-  letter-spacing: 0.04em;
-  color: rgba(255, 255, 255, 0.5);
-  padding: 6px 12px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.03);
+.section-header-compact {
+  margin-bottom: clamp(20px, 3vh, 28px);
+}
+
+.section-header-compact .section-kicker {
+  margin: 0;
 }
 
 /* --- Shared Bento Card (cùng bán kính bo & kính lỏng như .contact-form) --- */

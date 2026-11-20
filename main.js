@@ -18,8 +18,6 @@
       "theme.labelToLight": "Giao diện: Tối → Sáng",
       "theme.labelToDark": "Giao diện: Sáng → Tối",
 
-      "hero.subhead":
-        "Tận dụng AI để làm nhanh hơn, nhưng mọi dòng code đều được tôi hiểu, kiểm chứng và chịu trách nhiệm.",
       "hero.cta": "Xem năng lực",
       "hero.cta2": "Liên hệ",
 
@@ -30,7 +28,6 @@
       "facts.f4Title": "Đại học Sài Gòn",
       "facts.f4": "CNTT · 2022 – nay",
 
-      "about.title": "Xây hệ thống Full Stack chắc chắn, hiểu rõ từng quyết định.",
       "about.lead":
         "Sinh viên năm cuối ngành Công nghệ Thông tin tại Đại học Sài Gòn, định hướng Full Stack / Software Engineer.",
       "about.p1":
@@ -132,8 +129,6 @@
       "theme.labelToLight": "Theme: Dark → Light",
       "theme.labelToDark": "Theme: Light → Dark",
 
-      "hero.subhead":
-        "I leverage AI to move faster, but every line of code is understood, verified and owned by me.",
       "hero.cta": "See my expertise",
       "hero.cta2": "Contact",
 
@@ -144,7 +139,6 @@
       "facts.f4Title": "Saigon University",
       "facts.f4": "IT · 2022 – present",
 
-      "about.title": "Building solid full-stack systems, understanding every decision.",
       "about.lead":
         "Final-year Information Technology student at Saigon University, focused on Full Stack / Software Engineering.",
       "about.p1":
