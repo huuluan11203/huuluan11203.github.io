@@ -64,7 +64,8 @@
 
   const elements = Array.from(document.querySelectorAll(SELECTOR));
   if (!elements.length || !supportsSvgBackdrop()) return;
-  const reducedTransparency = window.matchMedia("(prefers-reduced-transparency: reduce)");
+  // Cố ý KHÔNG tôn trọng prefers-reduced-transparency: Windows tắt "Transparency effects"
+  // hoặc bật Energy/Battery Saver sẽ báo "reduce" → trước đây tắt hẳn kính. Giữ kính luôn bật.
 
   // ---------- B–D. Nhân tính map: tự chứa, chạy được trong Worker lẫn luồng chính ----------
   function mapKernel() {
@@ -418,7 +419,7 @@
   }
 
   function render(g) {
-    if (reducedTransparency.matches || !g.near) return;
+    if (!g.near) return;
     // offsetWidth/Height: kích thước layout, không bị transform/translate của hiệu ứng làm sai
     const w = g.node.offsetWidth;
     const h = g.node.offsetHeight;
@@ -430,7 +431,7 @@
     const nested = !!(g.node.parentElement && g.node.parentElement.closest(".mobile-sheet, .bento-card"));
     const large = w * h > DISPERSION_MAX_AREA;
     requestMaps(w, h, r, nested || large, !nested).then((maps) => {
-      if (token !== g.token || reducedTransparency.matches) return;
+      if (token !== g.token) return;
       g.key = key;
       g.nested = nested;
       g.node.style.setProperty("--lg-spec", 'url("' + maps.specURL + '")');
@@ -454,7 +455,7 @@
   }
 
   function setFilterActive(g, active) {
-    if (!g.filter || g.nested || reducedTransparency.matches) return;
+    if (!g.filter || g.nested) return;
     if (active) {
       g.node.style.setProperty("--lg-filter", "url(#" + g.id + ")");
       g.node.classList.add("is-refract");
@@ -462,16 +463,6 @@
       g.node.style.setProperty("--lg-filter", "none");
       g.node.classList.remove("is-refract");
     }
-  }
-
-  function disableAll() {
-    glasses.forEach((g) => {
-      g.token++;
-      g.key = null;
-      g.node.classList.remove("is-refract", "is-glass-panel", "is-glass-nested");
-      g.node.style.removeProperty("--lg-filter");
-      g.node.style.removeProperty("--lg-spec");
-    });
   }
 
   // Đổi kích thước: lần đầu dựng ngay, các lần sau gom lại (kéo cửa sổ không dựng liên tục)
@@ -507,10 +498,5 @@
   glasses.forEach((g) => {
     resizeObserver.observe(g.node);
     nearObserver.observe(g.node);
-  });
-
-  reducedTransparency.addEventListener("change", () => {
-    if (reducedTransparency.matches) disableAll();
-    else glasses.forEach(render);
   });
 })();

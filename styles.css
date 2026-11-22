@@ -1172,19 +1172,6 @@ body.menu-open {
   }
 }
 
-/* ---- Người dùng bật "Giảm độ trong suốt" trong hệ điều hành ---- */
-@media (prefers-reduced-transparency: reduce) {
-  :is(.nav-pill, .lang-pill, .burger-btn, .cta-btn, .mobile-sheet, .mobile-lang-btn, .mobile-signin-btn, .about-photo-wrap, .skill-block, .bento-card, .contact-form-glass, .submit-pill, .copy-btn, .dark-action-pill) {
-    background: rgba(28, 28, 34, 0.92) !important;
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
-  }
-
-  :is(.nav-pill, .lang-pill, .burger-btn, .cta-btn, .mobile-sheet, .mobile-lang-btn, .mobile-signin-btn, .about-photo-wrap, .skill-block, .bento-card, .contact-form-glass, .submit-pill, .copy-btn, .dark-action-pill)::before {
-    display: none;
-  }
-}
-
 /* Small frosted "glass pill" chips (nằm trong khung kính .bento-profile đã là Backdrop Root
    nên không cần thêm backdrop-filter riêng — tránh 9 lượt blur GPU thừa mỗi khung hình cuộn) */
 .skill-pills li {
@@ -1770,13 +1757,6 @@ html {
   }
 }
 
-/* Giảm độ trong suốt → chữ trắng đặc, không hiệu ứng kính */
-@media (prefers-reduced-transparency: reduce) {
-  .headline-line.line-1 {
-    filter: none !important;
-  }
-}
-
 .hero-role {
   margin: 0 0 clamp(28px, 4.4vh, 42px);
   padding-left: 0.42em; /* balance the trailing letter-spacing so it looks centred */
@@ -2352,20 +2332,10 @@ html {
 [data-theme="light"] .ng-rim { flood-color: var(--name-color-light); }
 [data-theme="light"] .ng-shadow { flood-opacity: calc(var(--name-shadow) * 0.35); }
 
-/* --- nền đặc khi không có backdrop-filter / giảm độ trong suốt --- */
+/* --- nền đặc khi trình duyệt không có backdrop-filter --- */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   [data-theme="light"] :is(.nav-pill, .lang-pill, .burger-btn, .cta-btn, .mobile-sheet, .mobile-lang-btn, .mobile-signin-btn, .about-photo-wrap, .skill-block, .bento-card, .contact-form-glass, .submit-pill, .copy-btn, .dark-action-pill) {
     background: rgba(204, 206, 214, 0.92) !important;
-  }
-}
-
-@media (prefers-reduced-transparency: reduce) {
-  [data-theme="light"] :is(.nav-pill, .lang-pill, .burger-btn, .cta-btn, .mobile-sheet, .mobile-lang-btn, .mobile-signin-btn, .about-photo-wrap, .skill-block, .bento-card, .contact-form-glass, .submit-pill, .copy-btn, .dark-action-pill) {
-    background: rgba(204, 206, 214, 0.95) !important;
-  }
-
-  [data-theme="light"] .headline-line.line-1 {
-    color: #1c1c22;
   }
 }
 
